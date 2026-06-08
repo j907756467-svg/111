@@ -1,0 +1,83 @@
+<view class="page">
+
+  <!-- Form -->
+  <view class="card">
+    <view class="form-heading">{{editingId ? '编辑行程' : '新建行程'}}</view>
+
+    <view class="field">
+      <text class="field-label">出差主题 / 事由 *</text>
+      <input class="field-input" maxlength="60" data-field="title" value="{{form.title}}"
+             bindinput="onInput" placeholder="如：深圳供应商验厂" />
+    </view>
+
+    <view class="field">
+      <text class="field-label">目的地</text>
+      <input class="field-input" maxlength="40" data-field="destination" value="{{form.destination}}"
+             bindinput="onInput" placeholder="如：深圳" />
+    </view>
+
+    <view class="field">
+      <text class="field-label">预算 (¥)</text>
+      <input class="field-input" type="digit" data-field="budget" value="{{form.budget}}"
+             bindinput="onInput" placeholder="如：5000" />
+    </view>
+
+    <view class="field">
+      <text class="field-label">出发日期</text>
+      <picker mode="date" value="{{form.startDate}}" bindchange="onStartDate">
+        <view class="picker-box {{form.startDate ? '' : 'placeholder'}}">
+          <text>{{form.startDate || '选择日期'}}</text>
+          <text class="picker-arrow">▾</text>
+        </view>
+      </picker>
+    </view>
+
+    <view class="field">
+      <text class="field-label">返回日期</text>
+      <picker mode="date" value="{{form.endDate}}" bindchange="onEndDate">
+        <view class="picker-box {{form.endDate ? '' : 'placeholder'}}">
+          <text>{{form.endDate || '选择日期'}}</text>
+          <text class="picker-arrow">▾</text>
+        </view>
+      </picker>
+    </view>
+
+    <view class="field">
+      <text class="field-label">备注</text>
+      <textarea class="field-input" maxlength="300" data-field="notes" value="{{form.notes}}"
+                bindinput="onInput" placeholder="行程目的、注意事项…" auto-height />
+    </view>
+
+    <view wx:if="{{error}}" class="form-error">{{error}}</view>
+
+    <view class="btn-row">
+      <button class="btn btn-primary {{editingId ? '' : 'btn-block'}}" bindtap="submit">{{editingId ? '保存修改' : '创建行程'}}</button>
+      <button wx:if="{{editingId}}" class="btn btn-ghost" bindtap="cancelEdit">取消</button>
+    </view>
+  </view>
+
+  <!-- List -->
+  <view class="card">
+    <view class="section-title">全部行程 ({{trips.length}})</view>
+    <view wx:if="{{trips.length === 0}}" class="muted">还没有行程，先在上方创建一段吧。</view>
+
+    <view wx:for="{{trips}}" wx:key="id" class="trip-card {{item.isCurrent ? 'is-current' : ''}}">
+      <view class="trip-card-body" data-id="{{item.id}}" bindtap="select">
+        <view class="trip-card-head">
+          <text class="trip-card-name">{{item.title}}</text>
+          <text wx:if="{{item.isCurrent}}" class="badge badge-current">当前</text>
+        </view>
+        <view class="trip-card-meta">{{item.meta}}</view>
+        <view class="trip-card-figures">
+          <text>{{item.budgetLabel}}</text>
+          <text class="{{item.over ? 'text-bad' : ''}}">{{item.spendLabel}}</text>
+        </view>
+      </view>
+      <view class="trip-card-actions">
+        <button class="icon-btn" data-id="{{item.id}}" catchtap="edit">✏️</button>
+        <button class="icon-btn" data-id="{{item.id}}" catchtap="remove">🗑️</button>
+      </view>
+    </view>
+  </view>
+
+</view>

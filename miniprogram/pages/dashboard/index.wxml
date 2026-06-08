@@ -1,0 +1,83 @@
+<view class="page">
+
+  <block wx:if="{{!hasTrip}}">
+    <view class="card empty">
+      <view class="empty-icon">🧳</view>
+      <view class="empty-title">还没有出差行程</view>
+      <view class="empty-text">创建你的第一段行程，开始规划日程、预算与行李。</view>
+      <button class="btn btn-primary" data-tab="trips" bindtap="goTab">新建行程</button>
+    </view>
+  </block>
+
+  <block wx:else>
+    <!-- Hero -->
+    <view class="hero">
+      <view class="hero-eyebrow">{{destination}} · {{countdown}}</view>
+      <view class="hero-title">{{title}}</view>
+      <view class="hero-dates">{{dateRange}}<text wx:if="{{daysLabel}}" class="pill">{{daysLabel}}</text></view>
+    </view>
+
+    <!-- Stat grid -->
+    <view class="stat-grid">
+      <view class="stat-card" data-tab="itinerary" bindtap="goTab">
+        <view class="stat-label">日程安排</view>
+        <view class="stat-value">{{itineraryCount}}<text class="stat-unit">项</text></view>
+        <view class="stat-link">查看日程 ›</view>
+      </view>
+      <view class="stat-card {{budgetCardClass}}">
+        <view class="stat-label">已花费</view>
+        <view class="stat-value">{{spend}}</view>
+        <view class="stat-sub">{{budgetLabel}}</view>
+      </view>
+      <view class="stat-card" data-tab="expenses" bindtap="goTab">
+        <view class="stat-label">预算结余</view>
+        <view class="stat-value {{remainingBad ? 'text-bad' : ''}}">{{remaining}}</view>
+        <view class="stat-link">管理费用 ›</view>
+      </view>
+      <view class="stat-card" data-tab="checklist" bindtap="goTab">
+        <view class="stat-label">行李清单</view>
+        <view class="stat-value">{{doneCount}}<text class="stat-unit">/{{checkTotal}}</text></view>
+        <view class="stat-link">整理行李 ›</view>
+      </view>
+    </view>
+
+    <!-- Budget bar -->
+    <view wx:if="{{hasBudget}}" class="card">
+      <view class="bar"><view class="bar-fill {{barClass}}" style="width:{{pct}}%"></view></view>
+      <view class="bar-text">预算使用 {{pct}}%{{overBudget ? ' · 已超支' : ''}}</view>
+    </view>
+
+    <!-- Upcoming -->
+    <view wx:if="{{upcoming.length}}" class="card">
+      <view class="section-title">即将进行</view>
+      <view wx:for="{{upcoming}}" wx:key="id" class="next-item">
+        <view class="next-when">{{item.when}}</view>
+        <view class="next-title">{{item.title}}</view>
+        <view wx:if="{{item.location}}" class="next-loc">📍 {{item.location}}</view>
+      </view>
+    </view>
+
+    <!-- All trips -->
+    <view class="card">
+      <view class="section-head">
+        <view class="section-title">全部行程 ({{trips.length}})</view>
+        <button class="btn btn-ghost btn-sm" data-tab="trips" bindtap="goTab">管理</button>
+      </view>
+      <view wx:for="{{trips}}" wx:key="id" class="trip-mini {{item.isCurrent ? 'is-current' : ''}}"
+            data-id="{{item.id}}" bindtap="selectTrip">
+        <view class="trip-mini-main">
+          <view class="trip-mini-name">{{item.name}}<text wx:if="{{item.isCurrent}}" class="badge badge-current" style="margin-left:12rpx">当前</text></view>
+          <view class="trip-mini-meta">{{item.meta}}</view>
+        </view>
+        <view class="trip-mini-spend">{{item.spend}}</view>
+      </view>
+    </view>
+
+    <!-- Data note -->
+    <view class="card note-card">
+      <view class="muted">数据仅保存在本机微信存储中，不会上传到服务器，卸载或清除后将丢失。</view>
+      <button class="btn btn-danger btn-sm" style="margin-top:20rpx" bindtap="resetAll">清空全部数据</button>
+    </view>
+  </block>
+
+</view>

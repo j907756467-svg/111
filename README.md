@@ -27,3 +27,8 @@ python3 -m http.server 8000
 - 视图模块位于 `js/views/`，每个模块导出 `{ id, title, subtitle, render(container, ctx) }`。
 - 数据层 `js/store.js` 统一负责状态与本地持久化。
 - 首次打开会自动生成一条示例行程，方便快速上手；可在仪表盘「清空全部数据」重置。
+
+## 微信小程序版
+
+仓库内还提供了同款功能的**微信小程序版本**，位于 [`miniprogram/`](miniprogram/)，配套根目录的 `project.config.json` 可直接用微信开发者工具导入。详见 [miniprogram/README.md](miniprogram/README.md)。
+

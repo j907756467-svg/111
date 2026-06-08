@@ -1,0 +1,43 @@
+.add-row { display: flex; gap: 16rpx; align-items: center; }
+.add-row .field-input { flex: 1; }
+
+.presets { margin-top: 24rpx; }
+.presets-label { font-size: 24rpx; color: var(--muted); margin-bottom: 14rpx; }
+.chips { display: flex; flex-wrap: wrap; gap: 14rpx; }
+.chip {
+  padding: 12rpx 22rpx;
+  border-radius: 999rpx;
+  border: 2rpx solid var(--border);
+  background: #fff;
+  font-size: 26rpx;
+  font-weight: 600;
+}
+.chip-all { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+.ck-item {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  background: var(--soft);
+  border-radius: 18rpx;
+  padding: 20rpx;
+  margin-bottom: 14rpx;
+}
+.ck-item:last-child { margin-bottom: 0; }
+.ck-label { display: flex; align-items: center; gap: 18rpx; flex: 1; }
+.ck-box {
+  width: 44rpx;
+  height: 44rpx;
+  border-radius: 12rpx;
+  border: 2rpx solid var(--border);
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 28rpx;
+  flex-shrink: 0;
+}
+.ck-box.checked { background: var(--primary); border-color: var(--primary); }
+.ck-text { font-weight: 600; }
+.ck-item.is-done .ck-text { text-decoration: line-through; color: var(--muted); }

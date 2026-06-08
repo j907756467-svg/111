@@ -1,0 +1,25 @@
+.btn-row { display: flex; gap: 18rpx; margin-top: 8rpx; }
+
+.trip-card {
+  display: flex;
+  align-items: stretch;
+  border: 2rpx solid var(--border);
+  border-radius: 22rpx;
+  overflow: hidden;
+  margin-bottom: 18rpx;
+}
+.trip-card:last-child { margin-bottom: 0; }
+.trip-card.is-current { border-color: var(--primary); }
+.trip-card-body { flex: 1; padding: 22rpx 24rpx; }
+.trip-card-head { display: flex; align-items: center; gap: 14rpx; }
+.trip-card-name { font-weight: 800; font-size: 32rpx; }
+.trip-card-meta { font-size: 24rpx; color: var(--muted); margin: 8rpx 0 12rpx; }
+.trip-card-figures { display: flex; gap: 28rpx; font-size: 26rpx; font-weight: 600; }
+.trip-card-actions {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8rpx;
+  padding: 0 10rpx;
+  border-left: 1rpx solid var(--border);
+}

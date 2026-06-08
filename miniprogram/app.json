@@ -1,0 +1,31 @@
+{
+  "pages": [
+    "pages/dashboard/index",
+    "pages/trips/index",
+    "pages/itinerary/index",
+    "pages/expenses/index",
+    "pages/checklist/index"
+  ],
+  "window": {
+    "navigationBarBackgroundColor": "#1b3a6b",
+    "navigationBarTextStyle": "white",
+    "navigationBarTitleText": "差旅通",
+    "backgroundColor": "#eef2f7",
+    "backgroundColorTop": "#1b3a6b"
+  },
+  "tabBar": {
+    "color": "#5d6b80",
+    "selectedColor": "#1b3a6b",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "black",
+    "list": [
+      { "pagePath": "pages/dashboard/index", "text": "仪表盘" },
+      { "pagePath": "pages/trips/index", "text": "行程" },
+      { "pagePath": "pages/itinerary/index", "text": "日程" },
+      { "pagePath": "pages/expenses/index", "text": "费用" },
+      { "pagePath": "pages/checklist/index", "text": "行李" }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

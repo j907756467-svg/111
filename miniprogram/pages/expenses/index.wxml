@@ -1,0 +1,89 @@
+<view class="page">
+
+  <block wx:if="{{!hasTrip}}">
+    <view class="card empty">
+      <view class="empty-icon">🧭</view>
+      <view class="empty-title">请先选择一段行程</view>
+      <view class="empty-text">费用属于具体的某次出差。</view>
+      <button class="btn btn-primary" bindtap="goTrips">前往行程管理</button>
+    </view>
+  </block>
+
+  <block wx:else>
+    <!-- Budget summary -->
+    <view class="card">
+      <view class="bsum">
+        <view>
+          <view class="stat-label">已花费</view>
+          <view class="bsum-big {{spendOver ? 'text-bad' : ''}}">{{spend}}</view>
+        </view>
+        <view class="bsum-right">
+          <view class="stat-label">预算</view>
+          <view class="bsum-mid">{{budgetLabel}}</view>
+        </view>
+      </view>
+      <block wx:if="{{hasBudget}}">
+        <view class="bar"><view class="bar-fill {{barClass}}" style="width:{{pct}}%"></view></view>
+        <view class="bar-text">{{remainingText}} · 使用 {{pct}}%</view>
+      </block>
+      <view wx:else class="muted">在「行程」中为本次出差设置预算后，可在此追踪结余。</view>
+    </view>
+
+    <!-- Breakdown -->
+    <view wx:if="{{breakdown.length}}" class="card">
+      <view class="section-title">分类占比</view>
+      <view wx:for="{{breakdown}}" wx:key="label" class="bd-row">
+        <view class="bd-label">{{item.label}}</view>
+        <view class="bd-track"><view class="bd-fill" style="width:{{item.pct}}%"></view></view>
+        <view class="bd-amt">{{item.amount}} <text class="bd-pct">{{item.pct}}%</text></view>
+      </view>
+    </view>
+
+    <!-- Add form -->
+    <view class="card">
+      <view class="form-heading">记一笔</view>
+      <view class="field-row">
+        <view class="field half">
+          <text class="field-label">类别</text>
+          <picker mode="selector" range="{{catLabels}}" value="{{form.categoryIndex}}" bindchange="onCategory">
+            <view class="picker-box"><text>{{catLabels[form.categoryIndex]}}</text><text class="picker-arrow">▾</text></view>
+          </picker>
+        </view>
+        <view class="field half">
+          <text class="field-label">日期</text>
+          <picker mode="date" value="{{form.date}}" bindchange="onDate">
+            <view class="picker-box"><text>{{form.date}}</text><text class="picker-arrow">▾</text></view>
+          </picker>
+        </view>
+      </view>
+      <view class="field">
+        <text class="field-label">金额 (¥) *</text>
+        <input class="field-input" type="digit" data-field="amount" value="{{form.amount}}"
+               bindinput="onInput" placeholder="0.00" />
+      </view>
+      <view class="field">
+        <text class="field-label">说明</text>
+        <input class="field-input" maxlength="80" data-field="note" value="{{form.note}}"
+               bindinput="onInput" placeholder="如：高铁票 / 客户晚餐" />
+      </view>
+      <view wx:if="{{error}}" class="form-error">{{error}}</view>
+      <button class="btn btn-primary btn-block" style="margin-top:8rpx" bindtap="add">添加费用</button>
+    </view>
+
+    <!-- List -->
+    <view class="card">
+      <view class="section-title">费用明细 ({{expenseCount}})</view>
+      <view wx:if="{{list.length === 0}}" class="muted">还没有费用记录。</view>
+      <view wx:for="{{list}}" wx:key="id" class="exp-item">
+        <view class="exp-icon">{{item.icon}}</view>
+        <view class="exp-body">
+          <view class="exp-note">{{item.note}}</view>
+          <view class="exp-meta">{{item.meta}}</view>
+        </view>
+        <view class="exp-amt">{{item.amount}}</view>
+        <button class="icon-btn" data-id="{{item.id}}" catchtap="remove">🗑️</button>
+      </view>
+    </view>
+  </block>
+
+</view>

@@ -1,0 +1,18 @@
+{
+  "description": "差旅通 - 出差行程规划微信小程序",
+  "miniprogramRoot": "miniprogram/",
+  "projectname": "tripmate",
+  "appid": "touristappid",
+  "compileType": "miniprogram",
+  "libVersion": "3.5.0",
+  "setting": {
+    "es6": true,
+    "enhance": true,
+    "postcss": true,
+    "minified": true,
+    "urlCheck": false,
+    "packNpmManually": false,
+    "nodeModules": false
+  },
+  "condition": {}
+}

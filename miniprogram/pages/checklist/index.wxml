@@ -1,0 +1,49 @@
+<view class="page">
+
+  <block wx:if="{{!hasTrip}}">
+    <view class="card empty">
+      <view class="empty-icon">🧭</view>
+      <view class="empty-title">请先选择一段行程</view>
+      <view class="empty-text">行李清单属于具体的某次出差。</view>
+      <button class="btn btn-primary" bindtap="goTrips">前往行程管理</button>
+    </view>
+  </block>
+
+  <block wx:else>
+    <!-- Progress -->
+    <view class="card">
+      <view class="bar"><view class="bar-fill good" style="width:{{pct}}%"></view></view>
+      <view class="bar-text">已完成 {{done}} / {{total}} 项{{allDone ? ' · 全部就绪 ✅' : ''}}</view>
+    </view>
+
+    <!-- Add -->
+    <view class="card">
+      <view class="add-row">
+        <input class="field-input" maxlength="60" value="{{inputText}}" bindinput="onInput"
+               placeholder="添加一项，如：转换插头" confirm-type="done" bindconfirm="addCustom" />
+        <button class="btn btn-primary" bindtap="addCustom">添加</button>
+      </view>
+
+      <view wx:if="{{presetsLeft.length}}" class="presets">
+        <view class="presets-label">常用项（点击添加）：</view>
+        <view class="chips">
+          <view wx:for="{{presetsLeft}}" wx:key="*this" class="chip" data-text="{{item}}" bindtap="addPreset">+ {{item}}</view>
+          <view wx:if="{{presetsLeft.length > 1}}" class="chip chip-all" bindtap="addAll">+ 全部添加</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- List -->
+    <view class="card">
+      <view wx:if="{{total === 0}}" class="muted">清单为空，从上方添加或选择常用项。</view>
+      <view wx:for="{{items}}" wx:key="id" class="ck-item {{item.done ? 'is-done' : ''}}">
+        <view class="ck-label" data-id="{{item.id}}" bindtap="toggle">
+          <view class="ck-box {{item.done ? 'checked' : ''}}">{{item.done ? '✓' : ''}}</view>
+          <view class="ck-text">{{item.text}}</view>
+        </view>
+        <button class="icon-btn" data-id="{{item.id}}" catchtap="remove">🗑️</button>
+      </view>
+    </view>
+  </block>
+
+</view>

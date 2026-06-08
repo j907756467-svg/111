@@ -1,0 +1,31 @@
+.bsum { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 22rpx; }
+.bsum-right { text-align: right; }
+.bsum-big { font-size: 56rpx; font-weight: 800; margin-top: 6rpx; }
+.bsum-mid { font-size: 36rpx; font-weight: 700; margin-top: 6rpx; }
+
+.field-row { display: flex; gap: 20rpx; }
+.field.half { flex: 1; }
+
+.bd-row { display: flex; align-items: center; gap: 16rpx; margin-bottom: 18rpx; }
+.bd-row:last-child { margin-bottom: 0; }
+.bd-label { width: 150rpx; font-size: 26rpx; font-weight: 600; }
+.bd-track { flex: 1; height: 16rpx; border-radius: 999rpx; background: var(--border); overflow: hidden; }
+.bd-fill { height: 100%; background: var(--primary); border-radius: 999rpx; }
+.bd-amt { width: 180rpx; text-align: right; font-size: 26rpx; font-weight: 700; }
+.bd-pct { color: var(--muted); font-weight: 600; font-size: 22rpx; }
+
+.exp-item {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  background: var(--soft);
+  border-radius: 18rpx;
+  padding: 18rpx 20rpx;
+  margin-bottom: 14rpx;
+}
+.exp-item:last-child { margin-bottom: 0; }
+.exp-icon { font-size: 36rpx; width: 48rpx; text-align: center; }
+.exp-body { flex: 1; min-width: 0; }
+.exp-note { font-weight: 700; }
+.exp-meta { font-size: 24rpx; color: var(--muted); margin-top: 4rpx; }
+.exp-amt { font-weight: 800; white-space: nowrap; }
