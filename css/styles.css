@@ -1,14 +1,14 @@
 :root {
-  --color-bg: #f4f6f5;
+  --color-bg: #faf7f0;
   --color-surface: #ffffff;
-  --color-ink: #16231d;
-  --color-ink-muted: #51625a;
-  --color-border: #d8e0dc;
-  --color-primary: #0b3d2e;
-  --color-primary-strong: #082c21;
-  --color-accent: #f5a623;
+  --color-ink: #2a2318;
+  --color-ink-muted: #7b7060;
+  --color-border: #ece3d3;
+  --color-primary: #a4760f;
+  --color-primary-strong: #7f5b0b;
+  --color-accent: #e3a51c;
   --color-accent-ink: #3a2900;
-  --color-good-bg: #e6f4ea;
+  --color-good-bg: #e9f5ea;
   --color-good-ink: #1e6b34;
   --color-warn-bg: #fff4e0;
   --color-warn-ink: #8a5a00;
@@ -16,7 +16,7 @@
   --color-bad-ink: #a32424;
   --radius-md: 12px;
   --radius-lg: 18px;
-  --shadow-card: 0 2px 14px rgba(11, 61, 46, 0.08);
+  --shadow-card: 0 2px 14px rgba(164, 118, 15, 0.10);
   --tap-min: 48px;
 }
 
@@ -39,24 +39,32 @@ body {
 
 /* ---------- Header ---------- */
 .app-header {
-  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-strong) 100%);
-  color: #fff;
+  background: var(--color-surface);
+  color: var(--color-ink);
   position: sticky;
   top: 0;
   z-index: 20;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.18);
+  border-bottom: 1px solid var(--color-border);
+  box-shadow: 0 1px 10px rgba(42, 35, 24, 0.06);
 }
 
 .app-header-inner {
   max-width: 960px;
   margin: 0 auto;
-  padding: 14px 16px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
 }
 
 .brand {
   display: flex;
   align-items: center;
   gap: 12px;
+  text-decoration: none;
+  color: inherit;
+  min-width: 0;
 }
 
 .brand-mark {
@@ -82,7 +90,33 @@ body {
 .brand-tagline {
   margin: 2px 0 0;
   font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.78);
+  color: var(--color-ink-muted);
+}
+
+/* Header store button — primary lead-gen entry point back to the shop */
+.header-cta {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 9px 16px;
+  border-radius: 999px;
+  background: var(--color-accent);
+  color: var(--color-accent-ink);
+  font-size: 0.9rem;
+  font-weight: 800;
+  text-decoration: none;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(227, 165, 28, 0.30);
+  transition: filter 0.15s ease;
+}
+
+.header-cta:hover {
+  filter: brightness(1.05);
+}
+
+.header-cta:active {
+  filter: brightness(0.95);
 }
 
 /* ---------- Calculator nav ---------- */
@@ -408,6 +442,40 @@ body {
   margin-bottom: 4px;
 }
 
+/* ---------- Store call-to-action (drives traffic to amicolight.com) ---------- */
+.store-cta {
+  margin-top: 20px;
+  background: linear-gradient(135deg, #fff8ea 0%, #fdeccb 100%);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.store-cta-title {
+  margin: 0 0 2px;
+  font-weight: 800;
+  font-size: 1.05rem;
+  color: var(--color-ink);
+}
+
+.store-cta-sub {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--color-ink-muted);
+}
+
+.store-cta-btn {
+  flex: 0 0 auto;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+
 /* ---------- Disclaimer ---------- */
 .disclaimer {
   margin-top: 20px;
@@ -460,6 +528,16 @@ body {
   font-size: 0.8rem;
 }
 
+.footer-link {
+  color: var(--color-primary);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.footer-link:hover {
+  text-decoration: underline;
+}
+
 /* ---------- Responsive ---------- */
 @media (min-width: 640px) {
   .calc-form {
@@ -497,43 +575,51 @@ body {
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --color-bg: #11201a;
-    --color-surface: #16291f;
-    --color-ink: #eef3ef;
-    --color-ink-muted: #a9bdb2;
-    --color-border: #2a4135;
-    --color-primary: #4cae8d;
-    --color-primary-strong: #3a8c70;
-    --color-accent: #f5a623;
+    --color-bg: #1a1710;
+    --color-surface: #221d14;
+    --color-ink: #f2ece0;
+    --color-ink-muted: #b7ab95;
+    --color-border: #3a3122;
+    --color-primary: #e2b551;
+    --color-primary-strong: #c89a3a;
+    --color-accent: #ecb53e;
     --color-accent-ink: #2a1d00;
-    --color-good-bg: rgba(76, 174, 141, 0.16);
-    --color-good-ink: #7fe0bd;
-    --color-warn-bg: rgba(245, 166, 35, 0.16);
-    --color-warn-ink: #f5c66b;
+    --color-good-bg: rgba(120, 190, 130, 0.16);
+    --color-good-ink: #92d9a2;
+    --color-warn-bg: rgba(236, 181, 62, 0.16);
+    --color-warn-ink: #f3cd78;
     --color-bad-bg: rgba(220, 88, 88, 0.18);
     --color-bad-ink: #ff9b9b;
   }
 
   .app-header {
-    background: linear-gradient(135deg, #102921 0%, #0a1c16 100%);
+    background: var(--color-surface);
   }
 
   .field-input {
-    background: #0f1d17;
+    background: #18130b;
     color: var(--color-ink);
   }
 
   .result-item,
   .result-message,
   .calc-note {
-    background: rgba(76, 174, 141, 0.08);
+    background: rgba(226, 181, 81, 0.08);
   }
 
   .result-item-highlight {
     background: var(--color-primary);
-    color: #07140f;
+    color: #1c1405;
   }
   .result-item-highlight .result-label {
-    color: rgba(7, 20, 15, 0.7);
+    color: rgba(28, 20, 5, 0.7);
+  }
+
+  .store-cta {
+    background: linear-gradient(135deg, rgba(226, 181, 81, 0.12) 0%, rgba(226, 181, 81, 0.05) 100%);
+  }
+
+  .header-cta {
+    box-shadow: none;
   }
 }
