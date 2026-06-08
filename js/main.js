@@ -1,60 +1,95 @@
-import * as ohmsLaw from './calculators/ohmsLaw.js';
-import * as voltageDrop from './calculators/voltageDrop.js';
-import * as ampacity from './calculators/ampacity.js';
-import * as boxFill from './calculators/boxFill.js';
-import * as conduitFill from './calculators/conduitFill.js';
-import * as motorFlc from './calculators/motorFlc.js';
-import * as lightingLoad from './calculators/lightingLoad.js';
-import * as transformer from './calculators/transformer.js';
+// App shell: builds the nav, routes between views via the URL hash, and keeps
+// the header's "current trip" indicator in sync. Each view module exports
+// { id, title, subtitle, render(container, ctx) } and is fully self-contained.
 
-const CALCULATORS = [
-  ohmsLaw, voltageDrop, ampacity, boxFill, conduitFill, motorFlc, lightingLoad, transformer,
-];
+import * as dashboard from './views/dashboard.js';
+import * as trips from './views/trips.js';
+import * as itinerary from './views/itinerary.js';
+import * as expenses from './views/expenses.js';
+import * as checklist from './views/checklist.js';
+import { getCurrentTrip } from './store.js';
+import { esc, prettyDate } from './utils.js';
 
-const nav = document.getElementById('calc-nav');
-const panel = document.getElementById('calc-panel');
-const calcTitle = document.getElementById('calc-title');
-const calcSubtitle = document.getElementById('calc-subtitle');
+const VIEWS = [dashboard, trips, itinerary, expenses, checklist];
+
+const nav = document.getElementById('view-nav');
+const panel = document.getElementById('view-panel');
+const viewTitle = document.getElementById('view-title');
+const viewSubtitle = document.getElementById('view-subtitle');
+const tripIndicator = document.getElementById('trip-indicator');
+
+let activeId = null;
+
+const ctx = {
+  // Re-render the currently active view in place (after a data mutation).
+  rerender() {
+    if (activeId) selectView(activeId, { keepScroll: true });
+  },
+  // Jump to another view by id.
+  navigate(id) {
+    if (location.hash !== `#${id}`) location.hash = `#${id}`;
+    else selectView(id);
+  },
+  // Update the header chip after the current trip changes.
+  refreshHeader: updateTripIndicator,
+};
 
 function buildNav() {
-  nav.innerHTML = CALCULATORS.map(
-    (calc) => `<button class="nav-btn" data-id="${calc.id}" type="button">${calc.title}</button>`
+  nav.innerHTML = VIEWS.map(
+    (v) => `<button class="nav-btn" data-id="${v.id}" type="button">${esc(v.navLabel || v.title)}</button>`
   ).join('');
 
   nav.addEventListener('click', (event) => {
     const btn = event.target.closest('.nav-btn');
-    if (!btn) return;
-    selectCalculator(btn.dataset.id);
+    if (btn) ctx.navigate(btn.dataset.id);
   });
 }
 
-function selectCalculator(id) {
-  const calc = CALCULATORS.find((c) => c.id === id) || CALCULATORS[0];
+function selectView(id, opts = {}) {
+  const view = VIEWS.find((v) => v.id === id) || VIEWS[0];
+  activeId = view.id;
 
   for (const btn of nav.querySelectorAll('.nav-btn')) {
-    btn.classList.toggle('is-active', btn.dataset.id === calc.id);
+    btn.classList.toggle('is-active', btn.dataset.id === view.id);
   }
 
-  calcTitle.textContent = calc.title;
-  calcSubtitle.textContent = calc.subtitle;
+  viewTitle.textContent = view.title;
+  viewSubtitle.textContent = view.subtitle;
   panel.innerHTML = '';
-  calc.render(panel);
+  view.render(panel, ctx);
+  updateTripIndicator();
 
-  if (location.hash !== `#${calc.id}`) {
-    history.replaceState(null, '', `#${calc.id}`);
+  if (location.hash !== `#${view.id}`) {
+    history.replaceState(null, '', `#${view.id}`);
   }
-  panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  if (!opts.keepScroll) {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+}
+
+function updateTripIndicator() {
+  const trip = getCurrentTrip();
+  if (!trip) {
+    tripIndicator.innerHTML = '<span class="trip-indicator-empty">未选择行程</span>';
+    return;
+  }
+  const range = [trip.startDate, trip.endDate].filter(Boolean).map(prettyDate).join(' → ');
+  tripIndicator.innerHTML = `
+    <span class="trip-indicator-label">当前行程</span>
+    <span class="trip-indicator-name">${esc(trip.title)}</span>
+    ${range ? `<span class="trip-indicator-dates">${esc(range)}</span>` : ''}
+  `;
 }
 
 function init() {
   buildNav();
   const requested = location.hash.replace('#', '');
-  const initial = CALCULATORS.find((c) => c.id === requested) ? requested : CALCULATORS[0].id;
-  selectCalculator(initial);
+  const initial = VIEWS.find((v) => v.id === requested) ? requested : VIEWS[0].id;
+  selectView(initial);
 
   window.addEventListener('hashchange', () => {
     const id = location.hash.replace('#', '');
-    if (CALCULATORS.find((c) => c.id === id)) selectCalculator(id);
+    if (VIEWS.find((v) => v.id === id)) selectView(id);
   });
 
   const year = document.getElementById('year');

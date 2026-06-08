@@ -1,69 +1,42 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
-  <meta name="theme-color" content="#0b3d2e">
-  <title>JobSite Volt — Electrical Calculators for Electricians</title>
-  <meta name="description" content="Fast field calculators for electricians: voltage drop, conductor ampacity, box fill, conduit fill, motor FLC, and Ohm's law — referenced to the NEC.">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%230b3d2e%22/><text x=%2250%22 y=%2270%22 font-size=%2266%22 text-anchor=%22middle%22 fill=%22%23f5a623%22>%E2%9A%A1</text></svg>">
+  <meta name="theme-color" content="#1b3a6b">
+  <title>差旅通 — 出差行程规划</title>
+  <meta name="description" content="差旅通是一款轻量的出差规划工具：管理行程、编排日程、记录费用对比预算、整理行李清单，数据全部保存在本地。">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%231b3a6b%22/><text x=%2250%22 y=%2272%22 font-size=%2262%22 text-anchor=%22middle%22>%F0%9F%A7%B3</text></svg>">
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
   <header class="app-header">
     <div class="app-header-inner">
       <div class="brand">
-        <span class="brand-mark" aria-hidden="true">⚡</span>
+        <span class="brand-mark" aria-hidden="true">🧳</span>
         <div>
-          <p class="brand-name">JobSite Volt</p>
-          <p class="brand-tagline">Electrical calculators for the field</p>
+          <p class="brand-name">差旅通</p>
+          <p class="brand-tagline">出差行程 · 日程 · 预算 · 行李，一站搞定</p>
         </div>
       </div>
+      <div class="trip-indicator" id="trip-indicator" aria-live="polite"></div>
     </div>
   </header>
 
-  <nav class="calc-nav" id="calc-nav" aria-label="Calculators"></nav>
+  <nav class="calc-nav" id="view-nav" aria-label="功能导航"></nav>
 
   <main class="app-main">
     <div class="calc-card">
       <div class="calc-card-header">
-        <h1 id="calc-title">—</h1>
-        <p id="calc-subtitle" class="calc-subtitle">—</p>
+        <h1 id="view-title">—</h1>
+        <p id="view-subtitle" class="calc-subtitle">—</p>
       </div>
-      <div class="calc-card-body" id="calc-panel"></div>
+      <div class="calc-card-body" id="view-panel"></div>
     </div>
-
-    <details class="disclaimer">
-      <summary>About this app &amp; important disclaimer</summary>
-      <div class="disclaimer-body">
-        <p>
-          <strong>JobSite Volt</strong> is a quick-reference field tool for common electrical
-          calculations used in U.S. residential and commercial work. It is built around
-          formulas and reference figures that are widely published and taught throughout the
-          trade — including values commonly associated with the National Electrical Code
-          (NEC / NFPA 70), such as Table 310.16 ampacities, Chapter 9 conduit/conductor fill
-          tables, 314.16(B) box-fill allowances, and Article 430 motor tables.
-        </p>
-        <p>
-          <strong>This app is a reference and estimating aid — not a substitute for the
-          current code book, engineering judgment, or a licensed electrician.</strong>
-          The NEC is updated on a three-year cycle (e.g., 2017, 2020, 2023…), and the
-          version actually in force — along with any state or local amendments — depends on
-          what your Authority Having Jurisdiction (AHJ) has adopted. Always verify
-          calculations and sizing decisions against the official, currently adopted code
-          and any local amendments before relying on them for installations, designs,
-          permits, or inspections.
-        </p>
-        <p>
-          Spotted a value that looks off, or have a calculator you'd like added? Treat the
-          results here as a starting point for your own verification, not a final answer.
-        </p>
-      </div>
-    </details>
   </main>
 
   <footer class="app-footer">
-    <p>JobSite Volt · Reference tool only — verify against the current NEC &amp; local code · © <span id="year"></span></p>
+    <p>差旅通 · 数据仅保存在本地浏览器，不会上传 · © <span id="year"></span></p>
   </footer>
 
   <script type="module" src="js/main.js"></script>
