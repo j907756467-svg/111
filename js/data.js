@@ -252,3 +252,72 @@ export const MOTOR_FLC_1PHASE = {
     { hp: 10, amps: [100, 50] },
   ],
 };
+
+// NEC Table 220.12 — general lighting load unit values by occupancy
+// (commonly published reference subset, in volt-amperes per square foot).
+// `demandKey`, where present, points into LIGHTING_DEMAND_FACTORS for the
+// Table 220.42 demand factors that may apply to that occupancy's general
+// lighting load.
+export const LIGHTING_UNIT_LOADS = [
+  { type: 'Armories and auditoriums', vaPerSqFt: 1.0 },
+  { type: 'Banks', vaPerSqFt: 3.5 },
+  { type: 'Barber shops and beauty parlors', vaPerSqFt: 3.0 },
+  { type: 'Churches', vaPerSqFt: 1.0 },
+  { type: 'Clubs', vaPerSqFt: 2.0 },
+  { type: 'Court rooms', vaPerSqFt: 2.0 },
+  { type: 'Dwelling units', vaPerSqFt: 3.0, demandKey: 'dwelling' },
+  { type: 'Garages — commercial (storage)', vaPerSqFt: 0.5 },
+  { type: 'Hospitals', vaPerSqFt: 2.0, demandKey: 'hospital' },
+  { type: 'Hotels & motels (incl. apartments without cooking)', vaPerSqFt: 2.0, demandKey: 'hotel' },
+  { type: 'Industrial / commercial (loft) buildings', vaPerSqFt: 2.0 },
+  { type: 'Lodge rooms', vaPerSqFt: 1.5 },
+  { type: 'Office buildings', vaPerSqFt: 3.5 },
+  { type: 'Restaurants', vaPerSqFt: 2.0 },
+  { type: 'Schools', vaPerSqFt: 3.0 },
+  { type: 'Stores', vaPerSqFt: 3.0 },
+  { type: 'Warehouses (storage)', vaPerSqFt: 0.25, demandKey: 'warehouse' },
+];
+
+// NEC Table 220.42 — lighting load demand factors. Each entry is a tier
+// described by its upper bound (VA) and the demand factor applied to the
+// portion of the connected load that falls within that tier (commonly
+// published reference subset).
+export const LIGHTING_DEMAND_FACTORS = {
+  dwelling: {
+    label: 'Dwelling units',
+    tiers: [
+      { upTo: 3000, factor: 1.00, note: 'first 3,000 VA' },
+      { upTo: 120000, factor: 0.35, note: 'next 3,001–120,000 VA' },
+      { upTo: Infinity, factor: 0.25, note: 'remainder over 120,000 VA' },
+    ],
+  },
+  hospital: {
+    label: 'Hospitals',
+    tiers: [
+      { upTo: 50000, factor: 0.40, note: 'first 50,000 VA' },
+      { upTo: Infinity, factor: 0.20, note: 'remainder over 50,000 VA' },
+    ],
+  },
+  hotel: {
+    label: 'Hotels & motels',
+    tiers: [
+      { upTo: 20000, factor: 0.50, note: 'first 20,000 VA' },
+      { upTo: 100000, factor: 0.40, note: 'next 20,001–100,000 VA' },
+      { upTo: Infinity, factor: 0.30, note: 'remainder over 100,000 VA' },
+    ],
+  },
+  warehouse: {
+    label: 'Warehouses (storage)',
+    tiers: [
+      { upTo: 12500, factor: 1.00, note: 'first 12,500 VA' },
+      { upTo: Infinity, factor: 0.50, note: 'remainder over 12,500 VA' },
+    ],
+  },
+};
+
+// Common standard dry-type transformer kVA ratings (widely published
+// industry-standard sizes) used to suggest a next-size-up selection.
+export const STANDARD_TRANSFORMER_KVA = [
+  1, 1.5, 2, 3, 5, 7.5, 10, 15, 25, 30, 37.5, 45, 50,
+  75, 100, 112.5, 150, 167, 200, 225, 250, 300, 333, 500, 750, 1000,
+];

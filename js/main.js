@@ -4,8 +4,12 @@ import * as ampacity from './calculators/ampacity.js';
 import * as boxFill from './calculators/boxFill.js';
 import * as conduitFill from './calculators/conduitFill.js';
 import * as motorFlc from './calculators/motorFlc.js';
+import * as lightingLoad from './calculators/lightingLoad.js';
+import * as transformer from './calculators/transformer.js';
 
-const CALCULATORS = [ohmsLaw, voltageDrop, ampacity, boxFill, conduitFill, motorFlc];
+const CALCULATORS = [
+  ohmsLaw, voltageDrop, ampacity, boxFill, conduitFill, motorFlc, lightingLoad, transformer,
+];
 
 const nav = document.getElementById('calc-nav');
 const panel = document.getElementById('calc-panel');

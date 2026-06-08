@@ -186,6 +186,20 @@ body {
   color: var(--color-ink-muted);
 }
 
+/* ---------- Multi-section calculators ---------- */
+.calc-section + .calc-section {
+  margin-top: 32px;
+  padding-top: 28px;
+  border-top: 1.5px dashed var(--color-border);
+}
+
+.calc-section-title {
+  margin: 0 0 16px;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--color-primary);
+}
+
 /* ---------- Forms ---------- */
 .calc-form {
   display: grid;
