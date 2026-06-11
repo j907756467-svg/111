@@ -6,13 +6,20 @@
 
 ## 打开方式
 
-需通过 HTTP 访问（使用了 ES Modules）：
+**方式一 · 单文件版（最简单，无需服务器）**
+直接双击 [`standalone.html`](standalone.html)，浏览器即可打开（CSS 与全部 JS 已内联，支持 `file://`）。
+适合本地查看、邮件 / 微信分享、离线演示。
+
+**方式二 · 多文件版（开发用，需 HTTP）**
+分模块版本使用 ES Modules，需经 HTTP 访问：
 
 ```bash
 # 在仓库根目录
 python3 -m http.server 8099
 # 浏览器打开 http://localhost:8099/selection-board/
 ```
+
+> 修改 `js/` 或 `css/` 后，运行 `node selection-board/build-standalone.mjs` 重新生成单文件版。
 
 ## 功能
 
@@ -50,8 +57,10 @@ $4,579 万占比 50.5%、智能款增速 +76% 等）。所有数据均可在看�
 
 ```
 selection-board/
-├── index.html          # 页面外壳
-├── css/board.css       # 主题样式（PPT 版式 / 图表 / 抽屉 / 打印）
+├── index.html              # 多文件版页面外壳
+├── standalone.html         # 单文件版（CSS+JS 全内联，可双击 / file:// 打开）
+├── build-standalone.mjs    # 由多文件构建单文件版的脚本
+├── css/board.css           # 主题样式（PPT 版式 / 图表 / 抽屉 / 打印）
 └── js/
     ├── defaultData.js  # 默认数据集（基于技能包示例）
     ├── charts.js       # 手写 SVG 图表引擎（折线/柱/条/环/雷达/甘特/仪表）

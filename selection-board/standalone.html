@@ -1,0 +1,1806 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#1c1812">
+  <title>选品立项 PPT 看板（单文件版）· Amico</title>
+  <meta name="description" content="亚马逊选品立项可视化 PPT 看板 — 9 章工作流、数据图表、决策门与本地数据存档。">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23c8861a%22/><text x=%2250%22 y=%2272%22 font-size=%2262%22 text-anchor=%22middle%22 fill=%22%23fff%22>📊</text></svg>">
+  <style>
+/* board.css — 选品立项 PPT 看板主题 */
+:root {
+  --bg: #1d1810;
+  --stage: #262017;
+  --panel: #ffffff;
+  --ink: #2a2318;
+  --muted: #7b7060;
+  --line: #ece3d3;
+  --line-2: #f3ecdf;
+  --gold: #c8861a;
+  --gold-strong: #a4760f;
+  --gold-soft: #fbf3e2;
+  --blue: #2b6cb0;
+  --green: #3f9b6b;
+  --red: #b5546a;
+  --good-bg: #e9f5ea; --good-ink: #1e6b34;
+  --bad-bg: #fdeaea; --bad-ink: #a32424;
+  --warn-bg: #fff4e0; --warn-ink: #8a5a00;
+  --radius: 14px;
+  --shadow: 0 8px 30px rgba(0, 0, 0, .28);
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { height: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", Roboto, Arial, sans-serif;
+  display: flex; flex-direction: column; overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ───────── 顶栏 ───────── */
+.tb {
+  display: flex; align-items: center; justify-content: space-between; gap: 14px;
+  padding: 10px 18px; background: #171209; color: #f5ecdb;
+  border-bottom: 1px solid #3a2f1d; flex-wrap: wrap;
+}
+.tb-brand { display: flex; align-items: center; gap: 12px; }
+.tb-mark {
+  width: 40px; height: 40px; border-radius: 11px; display: grid; place-items: center;
+  background: linear-gradient(135deg, var(--gold), var(--gold-strong)); font-size: 20px;
+}
+.tb-title { margin: 0; font-size: 16px; font-weight: 800; letter-spacing: .3px; }
+.tb-sub { margin: 0; font-size: 12px; color: #b7a988; }
+.tb-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.seg { display: inline-flex; background: #261d10; border: 1px solid #3a2f1d; border-radius: 10px; padding: 3px; }
+.seg-btn {
+  border: 0; background: transparent; color: #c9bda4; font-size: 13px; font-weight: 600;
+  padding: 7px 14px; border-radius: 8px; cursor: pointer;
+}
+.seg-btn.is-on { background: var(--gold); color: #1d1207; }
+.tb-btn {
+  border: 1px solid #3a2f1d; background: #261d10; color: #f0e6d3; font-size: 13px; font-weight: 600;
+  padding: 8px 14px; border-radius: 10px; cursor: pointer; transition: .15s;
+}
+.tb-btn:hover { background: #322615; border-color: var(--gold); }
+
+/* ───────── 布局 ───────── */
+.layout { flex: 1; min-height: 0; display: flex; }
+.side {
+  width: 250px; flex-shrink: 0; background: #211a11; border-right: 1px solid #352a1a;
+  overflow-y: auto; padding: 10px 8px 30px; color: #d8ccb4;
+}
+.side-head { font-size: 12px; font-weight: 700; color: #8d7d5f; padding: 10px 10px 6px; letter-spacing: .5px; }
+.side-ch { font-size: 12px; font-weight: 700; color: var(--gold); padding: 12px 10px 4px; }
+.side-item {
+  width: 100%; display: flex; gap: 9px; align-items: center; text-align: left;
+  background: transparent; border: 0; color: #cfc3aa; padding: 7px 10px; border-radius: 8px; cursor: pointer; font-size: 12.5px;
+}
+.side-item:hover { background: #2c2214; }
+.side-item.is-cur { background: var(--gold-soft); color: #5a3e08; font-weight: 600; }
+.side-no { flex-shrink: 0; width: 22px; height: 22px; border-radius: 6px; background: #322615; color: #b8a784; display: grid; place-items: center; font-size: 11px; font-weight: 700; }
+.side-item.is-cur .side-no { background: var(--gold); color: #fff; }
+.side-t { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.stage { flex: 1; min-width: 0; overflow-y: auto; background: var(--stage); }
+
+/* ───────── 幻灯片画布（固定 1280×720，JS 缩放） ───────── */
+.slide-frame { width: 100%; overflow: hidden; }
+.slide-canvas {
+  width: 1280px; height: 720px; transform-origin: top left; background: var(--panel);
+  padding: 44px 54px; position: relative; color: var(--ink);
+  display: flex; flex-direction: column;
+}
+.slide-canvas::after {
+  content: ""; position: absolute; left: 0; top: 0; width: 8px; height: 100%;
+  background: linear-gradient(var(--gold), var(--gold-strong));
+}
+
+/* 幻灯片头部 */
+.slide-head { margin-bottom: 18px; }
+.slide-kicker { font-size: 15px; font-weight: 700; color: var(--gold-strong); letter-spacing: .5px; }
+.kdot { margin-right: 4px; }
+.action-title { margin: 6px 0 0; font-size: 31px; line-height: 1.25; font-weight: 800; letter-spacing: .2px; }
+.slide-sub { margin: 8px 0 0; font-size: 16px; color: var(--muted); }
+.blk-title { margin: 0 0 10px; font-size: 16px; font-weight: 700; }
+.blk-title.good { color: var(--good-ink); } .blk-title.bad { color: var(--bad-ink); }
+
+/* 多列 */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; align-items: start; flex: 1; }
+.three-col { display: grid; grid-template-columns: 1.1fr .8fr 1fr; gap: 24px; align-items: start; flex: 1; }
+.center-col { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; }
+
+/* KPI 卡片 */
+.kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; flex: 1; align-content: center; }
+.kpi-card {
+  background: linear-gradient(150deg, #fffaf0, #fff); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 22px 24px; box-shadow: 0 2px 10px rgba(164,118,15,.06);
+}
+.kpi-label { font-size: 15px; color: var(--muted); font-weight: 600; }
+.kpi-value { font-size: 40px; font-weight: 800; color: var(--gold-strong); margin-top: 6px; line-height: 1; }
+.kpi-unit { font-size: 16px; color: var(--muted); margin-left: 6px; font-weight: 600; }
+.kpi-sub { font-size: 13.5px; color: var(--muted); margin-top: 8px; }
+
+/* 表格 */
+.data-table { width: 100%; border-collapse: collapse; font-size: 14.5px; }
+.data-table.compact { font-size: 12.8px; }
+.data-table th { background: #faf4e8; color: #6b5a36; font-weight: 700; text-align: left; padding: 9px 11px; border-bottom: 2px solid var(--line); white-space: nowrap; }
+.data-table td { padding: 8px 11px; border-bottom: 1px solid var(--line-2); }
+.data-table.compact td, .data-table.compact th { padding: 6px 9px; }
+.data-table tr:last-child td { border-bottom: 0; }
+.up { color: var(--green); font-weight: 700; }
+.stars { color: var(--gold); letter-spacing: 1px; }
+
+/* 热力矩阵 */
+.heat-table td.ht-cell { text-align: center; font-weight: 700; font-size: 13.5px; border: 1px solid #fff; }
+.heat-table td.ht-brand { font-weight: 700; white-space: nowrap; }
+
+/* 定义卡片 */
+.def-card { border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; margin-bottom: 16px; }
+.def-row { display: grid; grid-template-columns: 96px 1fr; gap: 10px; padding: 12px 16px; font-size: 15px; border-bottom: 1px solid var(--line-2); }
+.def-row:last-child { border-bottom: 0; }
+.def-row span { color: var(--muted); font-weight: 600; }
+
+/* chips / 关键词 */
+.chip { display: inline-block; padding: 4px 11px; border-radius: 999px; background: #f1ece0; color: #5e5340; font-size: 12.5px; font-weight: 600; margin: 0 6px 6px 0; }
+.chip.good { background: var(--good-bg); color: var(--good-ink); }
+.chip.muted { background: #eef1f4; color: #50617a; }
+.kw-block { display: flex; gap: 12px; align-items: baseline; margin-bottom: 12px; }
+.kw-tag { flex-shrink: 0; width: 66px; font-size: 13px; color: var(--muted); font-weight: 700; }
+
+/* 决策门 */
+.gate { border-radius: var(--radius); padding: 16px 18px; border: 1.5px solid; margin-top: 6px; }
+.gate-ok { background: #f3faf4; border-color: #bfe3c8; }
+.gate-wait { background: #fff7e8; border-color: #f0d9a8; }
+.gate-top { display: flex; align-items: center; gap: 10px; }
+.gate-icon { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; color: #fff; font-size: 14px; }
+.gate-ok .gate-icon { background: var(--green); }
+.gate-wait .gate-icon { background: var(--gold); }
+.gate-title { font-weight: 800; font-size: 16px; }
+.gate-pill { margin-left: auto; font-size: 12.5px; font-weight: 700; padding: 4px 12px; border-radius: 999px; cursor: pointer; }
+.gate-ok .gate-pill { background: var(--green); color: #fff; }
+.gate-wait .gate-pill { background: var(--gold); color: #fff; }
+.gate-desc { margin: 8px 0 6px; font-size: 13.5px; color: var(--muted); }
+.gate-value { font-size: 14.5px; }
+.gate-time { color: var(--muted); font-size: 12.5px; margin-left: 8px; }
+
+/* 工作流总览 */
+.flow { display: flex; align-items: stretch; gap: 4px; flex-wrap: wrap; justify-content: center; flex: 1; align-content: center; }
+.flow-node { width: 116px; background: #fffaf0; border: 1px solid var(--line); border-radius: 12px; padding: 14px 8px; text-align: center; position: relative; }
+.flow-n { width: 26px; height: 26px; border-radius: 50%; background: var(--gold); color: #fff; font-weight: 800; display: grid; place-items: center; margin: 0 auto 8px; font-size: 13px; }
+.flow-ico { font-size: 22px; } .flow-name { font-size: 13.5px; font-weight: 700; margin-top: 4px; }
+.flow-gate { font-size: 11px; color: var(--gold-strong); margin-top: 6px; font-weight: 700; }
+.flow-arrow { display: grid; place-items: center; color: var(--gold); font-size: 20px; font-weight: 800; }
+.note-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+
+/* 图表 */
+.chart { width: 100%; height: auto; display: block; }
+.chart-donut, .chart-radar { max-width: 100%; }
+
+/* VOC */
+.voc-bar { display: flex; align-items: center; gap: 10px; margin-top: 12px; }
+.voc-dim { width: 76px; font-size: 14px; font-weight: 600; flex-shrink: 0; }
+.voc-track { flex: 1; height: 16px; background: #f1ece0; border-radius: 999px; overflow: hidden; }
+.voc-fill { height: 100%; border-radius: 999px; }
+.voc-fill.good { background: var(--green); } .voc-fill.bad { background: var(--red); }
+.voc-pct { width: 40px; text-align: right; font-weight: 700; font-size: 14px; }
+.voc-note { font-size: 12.5px; color: var(--muted); margin: 2px 0 0 86px; }
+.callout { margin-top: 16px; background: var(--gold-soft); border-left: 4px solid var(--gold); padding: 12px 16px; border-radius: 8px; font-size: 14.5px; }
+.callout.sm { font-size: 13px; padding: 10px 13px; margin-top: 12px; }
+
+/* SWOT */
+.swot { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.swot-q { border-radius: 12px; padding: 12px 14px; border: 1px solid; }
+.swot-q b { font-size: 14px; } .swot-q ul { margin: 8px 0 0; padding-left: 18px; } .swot-q li { font-size: 13px; margin-bottom: 4px; }
+.swot-q.s { background: #f1f8f2; border-color: #cce6d2; } .swot-q.w { background: #fdf2f2; border-color: #f0d2d2; }
+.swot-q.o { background: #f0f5fb; border-color: #cfe0f0; } .swot-q.t { background: #fff6e9; border-color: #f0dcb4; }
+.sw-line { font-size: 13px; margin-top: 7px; padding-left: 4px; }
+.sw-line.good { color: var(--good-ink); } .sw-line.bad { color: var(--bad-ink); } .sw-line.tip { color: var(--gold-strong); }
+
+/* 交叉推导 */
+.cross-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; flex: 1; align-content: center; }
+.cross-card { border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; background: #fffaf0; }
+.cross-combo { font-size: 24px; font-weight: 800; color: var(--gold-strong); }
+.cross-mean { font-size: 14px; color: var(--muted); margin: 6px 0 12px; }
+.cross-dir { font-size: 15px; line-height: 1.5; }
+
+/* 公司卡片 */
+.company-card { border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 18px; }
+.company-head { display: flex; align-items: center; gap: 10px; font-size: 17px; }
+.company-meta { font-size: 12.5px; color: var(--muted); margin: 4px 0 10px; }
+.company-kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 10px; }
+.company-kpis div { background: #faf4e8; border-radius: 8px; padding: 8px; text-align: center; }
+.company-kpis b { display: block; font-size: 16px; color: var(--gold-strong); }
+.company-kpis span { font-size: 11px; color: var(--muted); }
+
+/* 洞察 */
+.insight { display: flex; gap: 10px; font-size: 14px; line-height: 1.5; margin-bottom: 12px; }
+.insight-n { flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%; background: var(--gold); color: #fff; display: grid; place-items: center; font-size: 12px; font-weight: 700; }
+
+/* 方向卡星级 / 专利 */
+.patent-row { display: grid; grid-template-columns: 78px 1fr; gap: 10px; font-size: 14px; padding: 9px 0; border-bottom: 1px solid var(--line-2); }
+.patent-row span { color: var(--muted); font-weight: 600; }
+
+/* 成本 / 仪表盘 */
+.cost-sum { margin-top: 12px; padding: 10px 14px; background: var(--gold-soft); border-radius: 8px; font-size: 15px; }
+.cost-sum strong, .gate strong { color: var(--gold-strong); }
+
+/* 立项九问 */
+.nine-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; flex: 1; align-content: center; }
+.nine-card { border: 1px solid var(--line); border-radius: 12px; padding: 13px 15px; background: #fffdf8; }
+.nine-q { font-size: 14.5px; font-weight: 700; display: flex; gap: 8px; align-items: center; }
+.nine-n { background: var(--gold); color: #fff; font-size: 11px; padding: 2px 7px; border-radius: 6px; }
+.nine-a { font-size: 12.5px; color: var(--muted); margin: 7px 0; line-height: 1.45; }
+.nine-score { font-size: 13px; color: var(--gold); letter-spacing: 1px; } .nine-score b { color: var(--ink); margin-left: 6px; }
+
+/* 决策 */
+.mini-bar { height: 12px; background: #f1ece0; border-radius: 999px; overflow: hidden; width: 100%; }
+.mini-bar div { height: 100%; background: var(--gold); }
+.decision-col { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+.decision-badge { font-size: 64px; font-weight: 900; padding: 20px 50px; border-radius: 20px; letter-spacing: 2px; }
+.decision-badge.go { background: var(--good-bg); color: var(--good-ink); border: 3px solid var(--green); }
+.decision-badge.nogo { background: var(--bad-bg); color: var(--bad-ink); border: 3px solid var(--red); }
+.decision-note { font-size: 14.5px; line-height: 1.6; margin-top: 18px; color: #4a4030; }
+
+/* 可编辑字段 */
+.editable { border-bottom: 1px dashed transparent; cursor: text; border-radius: 3px; padding: 0 1px; transition: .12s; }
+.deck-stage .editable:hover { border-bottom-color: var(--gold); background: var(--gold-soft); }
+.editable.editing { background: #fff; outline: 2px solid var(--gold); border-radius: 4px; }
+
+/* ───────── 封面 ───────── */
+.cover { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+.cover-badge { align-self: flex-start; background: var(--gold-soft); color: var(--gold-strong); font-weight: 700; font-size: 15px; padding: 7px 16px; border-radius: 999px; }
+.cover-title { font-size: 50px; font-weight: 900; margin: 22px 0 0; line-height: 1.2; max-width: 80%; }
+.cover-meta { display: flex; gap: 36px; margin: 26px 0 30px; flex-wrap: wrap; }
+.cover-meta div { font-size: 18px; font-weight: 700; }
+.cover-meta span { display: block; font-size: 13px; color: var(--muted); font-weight: 600; margin-bottom: 3px; }
+.cover-gates { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.cover-gates .gate { margin-top: 0; }
+
+/* ───────── 看板视图 ───────── */
+.stage-board { padding: 22px 26px 60px; }
+.board-group { margin-bottom: 26px; }
+.board-group-title { color: #e8dcc4; font-size: 15px; font-weight: 700; margin-bottom: 12px; }
+.board-group-title span { color: #9d8d6c; font-weight: 600; margin-left: 8px; font-size: 12.5px; }
+.board-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 18px; }
+.thumb { position: relative; padding: 0; border: 1px solid #3a2f1d; border-radius: 12px; overflow: hidden; cursor: pointer; background: #fff; box-shadow: var(--shadow); transition: .16s; display: block; }
+.thumb:hover { transform: translateY(-3px); border-color: var(--gold); box-shadow: 0 12px 34px rgba(0,0,0,.4); }
+.thumb .slide-canvas { pointer-events: none; }
+.thumb-no { position: absolute; left: 8px; top: 8px; background: rgba(29,18,7,.82); color: #fff; font-size: 12px; font-weight: 700; padding: 3px 9px; border-radius: 7px; }
+
+/* ───────── 演示视图 ───────── */
+.stage-deck { display: flex; align-items: center; justify-content: center; padding: 26px; }
+.deck-wrap { width: 100%; max-width: 1160px; }
+.deck-stage { border-radius: 16px; overflow: hidden; box-shadow: var(--shadow); }
+.deck-bar { display: flex; align-items: center; justify-content: center; gap: 22px; margin-top: 18px; }
+.nav-btn { background: #322615; color: #f0e6d3; border: 1px solid #4a3a20; padding: 10px 22px; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; }
+.nav-btn:hover:not(:disabled) { background: var(--gold); color: #1d1207; border-color: var(--gold); }
+.nav-btn:disabled { opacity: .35; cursor: default; }
+.deck-count { color: #d8ccb4; font-size: 14px; font-weight: 700; min-width: 70px; text-align: center; }
+
+/* ───────── 数据存档抽屉 ───────── */
+.mask { position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 40; }
+.drawer { position: fixed; right: 0; top: 0; height: 100%; width: 400px; max-width: 92vw; background: #fff; z-index: 50; box-shadow: -10px 0 40px rgba(0,0,0,.3); display: flex; flex-direction: column; }
+.drawer-head { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--line); }
+.drawer-head h3 { margin: 0; font-size: 17px; }
+.icon-btn { border: 0; background: #f1ece0; width: 32px; height: 32px; border-radius: 8px; cursor: pointer; font-size: 15px; }
+.drawer-body { padding: 18px 20px 40px; overflow-y: auto; }
+.dw-sec { margin-bottom: 26px; }
+.dw-sec h4 { margin: 0 0 10px; font-size: 14px; color: #6b5a36; }
+.dw-count { background: var(--gold); color: #fff; font-size: 12px; padding: 1px 8px; border-radius: 999px; margin-left: 4px; }
+.dw-input { width: 100%; padding: 9px 12px; border: 1px solid var(--line); border-radius: 9px; font-size: 14px; margin-bottom: 9px; }
+.dw-input:focus { outline: 2px solid var(--gold); border-color: transparent; }
+.dw-hint, .dw-empty { font-size: 12px; color: var(--muted); margin: 8px 0 0; line-height: 1.5; }
+.dw-empty { text-align: center; padding: 18px; background: #faf7f0; border-radius: 10px; }
+.dw-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+.btn-primary { width: 100%; background: var(--gold); color: #1d1207; border: 0; padding: 11px; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; }
+.btn-primary:hover { background: var(--gold-strong); color: #fff; }
+.btn-ghost { background: #faf7f0; border: 1px solid var(--line); color: var(--ink); padding: 10px; border-radius: 9px; font-size: 13px; font-weight: 600; cursor: pointer; }
+.btn-ghost:hover { border-color: var(--gold); }
+.btn-ghost.danger { color: var(--bad-ink); } .btn-ghost.danger:hover { border-color: var(--red); background: var(--bad-bg); }
+
+.ar-list { display: flex; flex-direction: column; gap: 9px; }
+.ar-item { display: flex; align-items: center; gap: 10px; border: 1px solid var(--line); border-radius: 11px; padding: 11px 13px; }
+.ar-main { flex: 1; min-width: 0; }
+.ar-name { font-weight: 700; font-size: 14px; }
+.ar-meta { font-size: 11.5px; color: var(--muted); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ar-acts { display: flex; gap: 5px; }
+.mini { border: 1px solid var(--line); background: #fff; border-radius: 7px; padding: 5px 9px; font-size: 12px; cursor: pointer; }
+.mini:hover { border-color: var(--gold); background: var(--gold-soft); }
+.mini.danger:hover { border-color: var(--red); background: var(--bad-bg); }
+
+/* ───────── Toast ───────── */
+.toast { position: fixed; bottom: 26px; left: 50%; transform: translateX(-50%) translateY(10px); background: #1d1207; color: #fff; padding: 11px 22px; border-radius: 999px; font-size: 13.5px; font-weight: 600; z-index: 60; opacity: 0; transition: .25s; box-shadow: var(--shadow); }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ───────── 打印 / PDF ───────── */
+.print-root { display: none; }
+@media print {
+  @page { size: 1280px 720px; margin: 0; }
+  body.printing > *:not(.print-root) { display: none !important; }
+  body.printing .print-root { display: block; }
+  .print-page { width: 1280px; height: 720px; overflow: hidden; page-break-after: always; }
+  .print-page .slide-canvas { width: 1280px; height: 720px; box-shadow: none; transform: none; }
+}
+
+/* ───────── 响应式 ───────── */
+@media (max-width: 980px) {
+  .side { display: none; }
+  .tb-title { font-size: 15px; }
+  .board-grid { grid-template-columns: 1fr; }
+}
+
+</style>
+</head>
+<body>
+  <header class="tb">
+    <div class="tb-brand">
+      <span class="tb-mark">📊</span>
+      <div>
+        <p class="tb-title">选品立项 PPT 看板</p>
+        <p class="tb-sub" id="tbSub">亚马逊选品立项 · Amico</p>
+      </div>
+    </div>
+    <div class="tb-actions">
+      <div class="seg" role="tablist">
+        <button class="seg-btn is-on" data-view="board" role="tab">▦ 看板</button>
+        <button class="seg-btn" data-view="deck" role="tab">▶ 演示</button>
+      </div>
+      <button class="tb-btn" data-act="archive">🗂 数据存档</button>
+      <button class="tb-btn" data-act="print">🖨 导出 PDF</button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="side" id="side" aria-label="章节导航"></aside>
+    <main class="stage" id="stage"></main>
+  </div>
+
+  <!-- 数据存档抽屉 -->
+  <div class="mask" id="mask" hidden></div>
+  <aside class="drawer" id="drawer" hidden aria-label="数据存档">
+    <div class="drawer-head">
+      <h3>🗂 数据存档</h3>
+      <button class="icon-btn" data-act="close-drawer" aria-label="关闭">✕</button>
+    </div>
+    <div class="drawer-body">
+      <section class="dw-sec">
+        <h4>保存当前为存档</h4>
+        <input id="snapName" class="dw-input" placeholder="存档名称，如「评审稿 v1」">
+        <input id="snapNote" class="dw-input" placeholder="备注（可选）">
+        <button class="btn-primary" data-act="save-snap">＋ 保存快照</button>
+        <p class="dw-hint">当前数据已自动缓存在本浏览器；快照可随时一键恢复。</p>
+      </section>
+
+      <section class="dw-sec">
+        <h4>历史存档 <span class="dw-count" id="arCount">0</span></h4>
+        <div id="arList" class="ar-list"></div>
+      </section>
+
+      <section class="dw-sec">
+        <h4>导入 / 导出</h4>
+        <div class="dw-grid">
+          <button class="btn-ghost" data-act="export-current">⬇ 导出当前报告</button>
+          <button class="btn-ghost" data-act="export-bundle">⬇ 导出整包(含存档)</button>
+          <button class="btn-ghost" data-act="import">⬆ 导入 JSON</button>
+          <button class="btn-ghost danger" data-act="reset">↺ 恢复默认数据</button>
+        </div>
+      </section>
+    </div>
+  </aside>
+
+  <input type="file" id="fileInput" accept="application/json,.json" hidden>
+  <div class="toast" id="toast" hidden></div>
+  <div class="print-root" id="printRoot" aria-hidden="true"></div>
+
+  <script type="module">
+
+/* ===== js/defaultData.js ===== */
+// defaultData.js — 默认数据集
+// 基于上传的 5 个技能包（产品概要 / 看市场 / 看竞争 / 定产品 / 完整工作流）示例数据构建
+// 品类：亚马逊浴室排气扇 (Bathroom Exhaust Fan) ｜ 己品品牌：Amico
+// 该数据可在看板中编辑，并通过「数据存档」保存为快照 / 导出 JSON。
+
+const SCHEMA_VERSION = 1;
+
+function buildDefaultData() {
+  return {
+    meta: {
+      title: '亚马逊浴室排气扇选品立项报告',
+      category: '浴室排气扇 (Bathroom Exhaust Fan)',
+      brand: 'Amico',
+      author: '选品立项工作组',
+      date: '2026-06-11',
+      reportVersion: 'v4',
+      // 三个关键人工确认节点（技能包强约束）
+      gates: {
+        brand: { status: 'confirmed', value: 'Amico', time: '2026-06-11' },
+        segment: { status: 'confirmed', value: '带灯款', assist: '智能款', time: '2026-06-11' },
+        direction: { status: 'confirmed', value: 'A', time: '2026-06-11' },
+      },
+    },
+
+    // ───────── 第 1 章 产品概要 ─────────
+    overview: {
+      definition: {
+        name: '浴室排气扇',
+        nameEn: 'Bathroom Exhaust Fan',
+        func: '排除浴室湿气 / 异味，改善空气流通，预防霉变',
+        scene: '家庭浴室 / 卫生间，嵌入天花板安装',
+      },
+      classes: [
+        { name: '带灯款', asin: 1180, salesShare: 48, revShare: 50.5, avgPrice: 96 },
+        { name: '常规款', asin: 760, salesShare: 33, revShare: 27.0, avgPrice: 58 },
+        { name: '加热款', asin: 250, salesShare: 9, revShare: 12.8, avgPrice: 142 },
+        { name: '智能款', asin: 150, salesShare: 10, revShare: 9.7, avgPrice: 88 },
+      ],
+      params: [
+        { dim: 'CFM 风量', desc: '排气能力，决定适用面积', viz: '分布直方图' },
+        { dim: '噪音 / sone', desc: '静音程度，越低越优', viz: '分段占比' },
+        { dim: '亮度 / LM', desc: '照明能力（带灯款）', viz: '分段占比' },
+        { dim: '色温 / K', desc: '灯光色调，可调 vs 固定', viz: '可调占比' },
+        { dim: '价格 / USD', desc: '售价区间', viz: '价格段分布' },
+        { dim: '认证', desc: 'Energy Star / HVI / ETL', viz: '认证占比' },
+      ],
+      keywords: {
+        core: ['bathroom exhaust fan', 'bathroom fan', 'ventilation fan'],
+        longtail: ['bathroom exhaust fan with light', 'quiet bathroom fan', 'exhaust fan with humidity sensor'],
+        attr: ['quiet', 'LED', 'humidity sensor', '110 CFM', 'energy star', '5 CCT'],
+        brand: ['Broan', 'Panasonic', 'Delta', 'KAZE'],
+      },
+    },
+
+    // ───────── 第 2 章 看市场 ─────────
+    market: {
+      kpis: [
+        { label: '总销额(近12月)', value: '9,071', unit: '万美元', sub: '≈ $0.91 亿' },
+        { label: '总销量(近12月)', value: '116.3', unit: '万件', sub: '同比 +18%' },
+        { label: '市场均价', value: '78', unit: '美元', sub: '总销额/总销量' },
+        { label: '活跃品牌数', value: '187', unit: '个', sub: 'ASIN 2,340 个' },
+        { label: '新品率(近6月)', value: '18', unit: '%', sub: '创新活跃度中等' },
+        { label: '月均销额', value: '756', unit: '万美元', sub: '春季装修旺季走高' },
+      ],
+      // 月度趋势（万美元），春季 3-5 月装修旺季走高
+      trend: [
+        { month: '2025-06', rev: 790, vol: 9.8 },
+        { month: '2025-07', rev: 740, vol: 9.4 },
+        { month: '2025-08', rev: 720, vol: 9.1 },
+        { month: '2025-09', rev: 760, vol: 9.6 },
+        { month: '2025-10', rev: 800, vol: 10.2 },
+        { month: '2025-11', rev: 780, vol: 10.0 },
+        { month: '2025-12', rev: 591, vol: 7.6 },
+        { month: '2026-01', rev: 620, vol: 8.0 },
+        { month: '2026-02', rev: 660, vol: 8.5 },
+        { month: '2026-03', rev: 820, vol: 10.6 },
+        { month: '2026-04', rev: 910, vol: 11.7 },
+        { month: '2026-05', rev: 880, vol: 11.3 },
+      ],
+      priceDist: [
+        { range: '<$50', volShare: 22, revShare: 12, brands: 96 },
+        { range: '$50-100', volShare: 41, revShare: 38, brands: 124 },
+        { range: '$100-150', volShare: 24, revShare: 30, brands: 68 },
+        { range: '$150-200', volShare: 9, revShare: 14, brands: 31 },
+        { range: '>$200', volShare: 4, revShare: 6, brands: 18 },
+      ],
+      cfmDist: [
+        { range: '50CFM', share: 12 },
+        { range: '80CFM', share: 38 },
+        { range: '110CFM', share: 35 },
+        { range: '130CFM+', share: 15 },
+      ],
+      soneDist: [
+        { range: '≤0.5 sone', share: 14 },
+        { range: '≤1.0 sone', share: 47 },
+        { range: '≤1.5 sone', share: 28 },
+        { range: '>1.5 sone', share: 11 },
+      ],
+      // 细分优先度评估（AI 推荐排序）
+      segments: [
+        { name: '带灯款', rev: 4579, revShare: 50.5, growth: 22, brands: 92, stars: 5, layout: '己品已有 $106万 布局', strategy: '巩固 + 扩展色温可调优势' },
+        { name: '智能款', rev: 884, revShare: 9.7, growth: 76, brands: 30, stars: 4, layout: '己品空白 · 蓝海', strategy: '蓝海卡位，快速迭代' },
+        { name: '加热款', rev: 1162, revShare: 12.8, growth: 50, brands: 41, stars: 3, layout: '己品空白', strategy: '评估进入可行性' },
+        { name: '常规款', rev: 2446, revShare: 27.0, growth: 8, brands: 118, stars: 2, layout: '己品已有布局', strategy: '以守为主，优化利润' },
+      ],
+    },
+
+    // ───────── 第 3 章 看竞争（仅主攻细分 = 带灯款） ─────────
+    competitor: {
+      cr5: 67, cr10: 85,
+      brandRank: [
+        { rank: 1, brand: 'Broan-NuTone', rev: 1145, asin: 86, avgPrice: 89, share: 25.0 },
+        { rank: 2, brand: 'Panasonic', rev: 824, asin: 42, avgPrice: 165, share: 18.0 },
+        { rank: 3, brand: 'Delta', rev: 458, asin: 38, avgPrice: 95, share: 10.0 },
+        { rank: 4, brand: 'KAZE', rev: 367, asin: 24, avgPrice: 119, share: 8.0 },
+        { rank: 5, brand: 'Homewerks', rev: 275, asin: 31, avgPrice: 72, share: 6.0 },
+        { rank: 6, brand: 'Hunter', rev: 229, asin: 19, avgPrice: 99, share: 5.0 },
+        { rank: 7, brand: 'Air King', rev: 183, asin: 22, avgPrice: 68, share: 4.0 },
+        { rank: 8, brand: 'Aero Pure', rev: 160, asin: 15, avgPrice: 145, share: 3.5 },
+        { rank: 9, brand: 'VENTS', rev: 137, asin: 12, avgPrice: 130, share: 3.0 },
+        { rank: 10, brand: 'Akicon', rev: 115, asin: 14, avgPrice: 79, share: 2.5 },
+      ],
+      // 竞品产品线价格段布局（ASIN 数量）
+      priceLayout: [
+        { brand: 'Broan-NuTone', d: [8, 22, 31, 16, 6, 3] },
+        { brand: 'Panasonic', d: [0, 4, 12, 14, 8, 4] },
+        { brand: 'Delta', d: [3, 14, 13, 6, 2, 0] },
+      ],
+      priceLayoutCols: ['<$50', '$50-80', '$80-120', '$120-160', '$160-200', '>$200'],
+      // 核心参数覆盖矩阵（ASIN 数量）
+      paramMatrix: [
+        { brand: 'Broan-NuTone', d: [34, 31, 12, 48, 18, 6, 4] },
+        { brand: 'Panasonic', d: [6, 28, 22, 14, 24, 9, 2] },
+        { brand: 'Delta', d: [18, 14, 5, 26, 9, 3, 1] },
+      ],
+      paramMatrixCols: ['80CFM', '110CFM', '≤0.5sone', '≤1.0sone', '色温可调', '智能', '加热'],
+      insights: [
+        '竞品主力阵地集中在 $80-120，$120-160 高端中端存在结构性空白，可作为己品上探切口。',
+        'Panasonic 主打超静音(≤0.5sone)但色温可调覆盖弱；Broan 量大但静音与色温可调是盲区。',
+        '头部品牌色温可调 SKU 占比偏低（<25%），己品「静音 + 5档色温可调」组合具备差异化窗口。',
+      ],
+      companies: [
+        {
+          name: 'Broan-NuTone', founded: 1932, hq: '美国威斯康星', parent: 'Madison Air',
+          positioning: '大众走量 · 渠道为王', asin: 86, rev: 1145, avgPrice: 89, share: 25.0,
+          pros: '品牌认知度高、渠道铺货广、价格带齐全', cons: '静音与色温可调创新滞后，高端溢价不足',
+          insight: 'Amico 可在其薄弱的静音 + 色温可调维度做差异化卡位',
+        },
+        {
+          name: 'Panasonic', founded: 1918, hq: '日本大阪', parent: 'Panasonic Holdings',
+          positioning: '高端静音 · 技术壁垒', asin: 42, rev: 824, avgPrice: 165, share: 18.0,
+          pros: 'DC 电机超静音技术领先、品牌溢价强、口碑好', cons: '价格高($150+)、色温可调与高流明覆盖不足',
+          insight: 'Amico 用「接近的静音 + 更优性价比 + 色温可调」错位竞争',
+        },
+      ],
+      bestParent: {
+        asin: 'B07XXXLIGHT', name: 'Broan-NuTone 110 CFM 带灯排气扇旗舰款',
+        rev: 318, price: 89.99, params: '110CFM / 1.0 sone / 1200LM / 4000K',
+        rows: [
+          { dim: '灯光亮度', spec: '1200LM / 4000K 固定', voc: '亮度足够(好评 31%)' },
+          { dim: '电机类型', spec: '交流 AC 电机', voc: '静音好评率 22%，部分反馈偏吵' },
+          { dim: '安装设计', spec: '快装支架', voc: '安装好评 28.5%' },
+          { dim: '认证', spec: 'Energy Star / HVI', voc: '消费者信任度高' },
+          { dim: '评分', spec: '4.5 星 (3,210 条)', voc: '高于品类均值 4.3' },
+          { dim: '退货率', spec: '4.2%', voc: '低于品类均值 6.1%' },
+        ],
+        success: [
+          '价格锚定精准：$89.99 卡在主力价格段甜点，走量能力强',
+          '快装支架降低安装门槛，安装好评率达 28.5%',
+          '110CFM + 1200LM 参数组合覆盖主流需求',
+          'Energy Star / HVI 双认证建立信任，退货率仅 4.2%',
+        ],
+      },
+    },
+
+    // ───────── 第 4 章 看用户 VOC（仅主攻细分） ─────────
+    user: {
+      pros: [
+        { dim: '静音表现', share: 34, note: '“安静到几乎听不见”' },
+        { dim: '灯光亮度', share: 28, note: '“浴室一下子亮堂了”' },
+        { dim: '安装便捷', share: 21, note: '“快装支架，一个人就能装”' },
+        { dim: '排气效果', share: 17, note: '“镜子不再起雾”' },
+      ],
+      cons: [
+        { dim: '噪音偏大', share: 38, note: 'AC 电机款集中差评' },
+        { dim: '色温单一', share: 24, note: '“只有冷白光，不够温馨”' },
+        { dim: '灯光偏暗', share: 19, note: '<800LM 款集中' },
+        { dim: '接线复杂', share: 11, note: '传统接线款' },
+      ],
+      // 不同 sone 区间的好评率（参数临界值识别）
+      soneSatisfaction: [
+        { range: '≤0.3', pos: 92 },
+        { range: '0.3-0.5', pos: 88 },
+        { range: '0.5-0.8', pos: 81 },
+        { range: '0.8-1.0', pos: 68 },
+        { range: '1.0-1.5', pos: 52 },
+        { range: '>1.5', pos: 34 },
+      ],
+      criticalInsight: '静音满意度临界点在 0.8 sone：≤0.8 sone 好评率 81%+，>1.0 sone 骤降至 52%。己品方向应锁定 ≤0.8 sone。',
+    },
+
+    // ───────── 第 5 章 看自己 SWOT（仅主攻细分） ─────────
+    self: {
+      productLine: [
+        { sku: 'Amico 80CFM 带灯款', price: 64.99, rev: 62, status: '在售' },
+        { sku: 'Amico 110CFM 带灯款', price: 79.99, rev: 44, status: '在售' },
+      ],
+      supplyChain: '深圳自有合作工厂，支持私模；交期 35 天；DC 电机已有供应商导入中',
+      swot: {
+        S: ['色温可调技术已量产', '深圳供应链私模能力', '带灯款已有 $106万 销售基础'],
+        W: ['静音水平落后 Panasonic', '品牌认知度低于头部', '高端价格段($120+)空白'],
+        O: ['色温可调渗透率仍低(<25%)', '$120-160 价格带结构性空白', '智能款蓝海(增速+76%)'],
+        T: ['Broan 价格战', 'Panasonic 静音技术壁垒', '原材料 / 物流成本波动'],
+      },
+    },
+
+    // ───────── 第 6 章 定产品（3 方向均在带灯款内） ─────────
+    product: {
+      swotCross: [
+        { combo: 'S+O', meaning: '利用优势抓住机会', dir: '基于色温可调优势，升级静音 + 高流明旗舰款（→方向A）' },
+        { combo: 'S+T', meaning: '利用优势规避威胁', dir: '强化静音 + 性价比，巩固中端防止跟进（→方向B）' },
+        { combo: 'W+O', meaning: '克服劣势抓住机会', dir: '导入 DC 电机超静音，填补 $120+ 高端空白（→方向C）' },
+      ],
+      directions: [
+        {
+          id: 'A', name: 'Amico 旗舰静音色温可调带灯排气扇', stars: 5, rec: '推荐度最高',
+          price: '$80-120', target: 99.99, params: '110CFM / ≤0.8sone / ≥1200LM / 5档色温可调',
+          userType: '创新型产品', users: 'DIY 房主 / 新房装修用户',
+          selling: '静音 + 色温可调双壁垒', link: '延伸现有色温可调技术，升级静音水平',
+          expSales: 800, score: 4.7,
+          radar: [
+            { dim: '风量', self: 5, c1: 5, c2: 5, c3: 4 },
+            { dim: '静音', self: 4, c1: 3, c2: 2, c3: 5 },
+            { dim: '灯光', self: 5, c1: 4, c2: 2, c3: 5 },
+            { dim: '安装', self: 4, c1: 4, c2: 3, c3: 5 },
+            { dim: '性价比', self: 5, c1: 3, c2: 2, c3: 1 },
+            { dim: '口碑', self: 5, c1: 4, c2: 3, c3: 5 },
+            { dim: '差异化', self: 5, c1: 3, c2: 1, c3: 4 },
+          ],
+          benchNames: ['己品目标', 'KAZE $129.99', 'Broan $149.99', 'Panasonic $189.99'],
+          benchScore: [4.7, 3.7, 2.7, 4.3],
+        },
+        {
+          id: 'B', name: 'Amico 中端色温可调带灯排气扇', stars: 4, rec: '性价比走量',
+          price: '$60-80', target: 69.99, params: '80CFM / ≤1.0sone / ≥1000LM / 3档色温可调',
+          userType: '自由100产品', users: '价格敏感 DIY / 出租屋改造',
+          selling: '色温可调 + 极致性价比', link: '基于现有走量款迭代，降本扩份额',
+          expSales: 1400, score: 4.2,
+          radar: [
+            { dim: '风量', self: 4, c1: 4, c2: 5, c3: 4 },
+            { dim: '静音', self: 3, c1: 3, c2: 2, c3: 4 },
+            { dim: '灯光', self: 4, c1: 4, c2: 3, c3: 4 },
+            { dim: '安装', self: 4, c1: 4, c2: 3, c3: 4 },
+            { dim: '性价比', self: 5, c1: 4, c2: 5, c3: 3 },
+            { dim: '口碑', self: 4, c1: 4, c2: 3, c3: 4 },
+            { dim: '差异化', self: 4, c1: 3, c2: 2, c3: 3 },
+          ],
+          benchNames: ['己品目标', 'Homewerks $72', 'Broan $79', 'Air King $68'],
+          benchScore: [4.2, 3.8, 4.0, 3.5],
+        },
+        {
+          id: 'C', name: 'Amico 高端静音色温可调带灯排气扇', stars: 3, rec: '高端突破',
+          price: '$120-160', target: 139.99, params: '130CFM / ≤0.5sone / ≥1500LM / 5档色温可调+夜灯',
+          userType: '创新型产品', users: '高端装修 / 大浴室房主',
+          selling: '超静音 + 高流明 + 夜灯三合一', link: '填补 $120+ 高端空白，提升品牌溢价',
+          expSales: 350, score: 4.1,
+          radar: [
+            { dim: '风量', self: 5, c1: 5, c2: 4, c3: 5 },
+            { dim: '静音', self: 5, c1: 4, c2: 3, c3: 5 },
+            { dim: '灯光', self: 5, c1: 5, c2: 4, c3: 5 },
+            { dim: '安装', self: 4, c1: 4, c2: 4, c3: 5 },
+            { dim: '性价比', self: 4, c1: 3, c2: 3, c3: 1 },
+            { dim: '口碑', self: 4, c1: 5, c2: 4, c3: 5 },
+            { dim: '差异化', self: 5, c1: 4, c2: 3, c3: 4 },
+          ],
+          benchNames: ['己品目标', 'Aero Pure $145', 'KAZE $129', 'Panasonic $189'],
+          benchScore: [4.1, 4.3, 3.9, 4.0],
+        },
+      ],
+      // 产品定义表（确认方向 A 后生成，双 SKU）
+      defTable: {
+        cols: ['参数', 'SKU1', 'SKU2'],
+        rows: [
+          ['产品名称', '带灯浴室排气扇 80CFM', '带灯浴室排气扇 110CFM'],
+          ['用户类型', '略胜型产品', '创新型产品'],
+          ['父体结构', 'BS100 / 80CFM 0.8Sone DC 带灯 5CCT', 'BS100 / 110CFM 0.8Sone DC 带灯 5CCT'],
+          ['输入电压', '120V', '120V'],
+          ['色温', '2700/3000/3500/4000/5000K', '2700/3000/3500/4000/5000K'],
+          ['功率', '电机18W / 光源18W', '电机22W / 光源18W'],
+          ['光通量', '1200LM', '1200LM'],
+          ['风量', '80CFM', '110CFM'],
+          ['噪音', '≤0.8 SONE', '≤0.8 SONE'],
+          ['认证', 'ETL、HVI', 'ETL、HVI'],
+          ['采购价', '¥176', '¥192'],
+          ['售价', '$89.99', '$99.99'],
+          ['毛利率', '38.5%', '37.7%'],
+        ],
+      },
+      patent: {
+        appearance: '工厂私模设计，无外观侵权风险；我司同步安排专利排查中',
+        invention: '色温可调电路为公知技术 / 已获授权专利保护，无侵权风险',
+        risk: '低风险',
+        action: '量产前完成 FTO 检索，预计 2 周完成；私模外观同步申请专利',
+      },
+    },
+
+    // ───────── 第 7 章 定策略（仅确认方向 A） ─────────
+    strategy: {
+      // 单件成本结构（基于 SKU2 110CFM，售价 $99.99）
+      costRows: [
+        { item: '采购成本', value: 26.7, note: '¥192 ≈ $26.7' },
+        { item: '头程物流', value: 4.2, note: '海运 + 关税' },
+        { item: 'FBA 配送费', value: 12.0, note: '标准尺寸' },
+        { item: '平台佣金(15%)', value: 15.0, note: '$99.99×15%' },
+        { item: '推广 / 广告', value: 8.0, note: 'ACOS 摊销' },
+        { item: '退货 / 售后', value: 2.0, note: '退货率 4%' },
+      ],
+      price: 99.99,
+      grossMargin: 37.7,
+      // 盈亏平衡
+      breakeven: { fixedInvest: 22, monthlyUnit: 580, note: '模具 $8k + 认证 $6k + 首批库存 $8k' },
+      // 首年 ROI 测算
+      roi: {
+        monthlyTarget: 800,
+        unitProfit: 32.1,
+        year1Sales: 9600,
+        year1Revenue: 95.99,   // 万美元
+        year1Profit: 30.8,     // 万美元
+        roiPct: 140,
+        payback: 4.2,          // 月
+      },
+    },
+
+    // ───────── 第 8 章 项目计划（甘特图，仅确认方向 A） ─────────
+    timeline: {
+      totalWeeks: 24,
+      milestones: [
+        { phase: '产品定义 & BOM', start: 1, end: 2, owner: '产品' },
+        { phase: '开模 / 打样 EVT', start: 3, end: 6, owner: '工程' },
+        { phase: 'ETL / HVI 认证', start: 5, end: 10, owner: '合规' },
+        { phase: 'DVT 设计验证', start: 7, end: 10, owner: '工程' },
+        { phase: 'PVT 量产试产', start: 11, end: 13, owner: '供应链' },
+        { phase: '头程物流入仓', start: 13, end: 16, owner: '物流' },
+        { phase: 'Listing & 上架', start: 15, end: 17, owner: '运营' },
+        { phase: '推广爬升期', start: 17, end: 24, owner: '运营' },
+      ],
+    },
+
+    // ───────── 第 9 章 立项评审（立项九问 + Go/NoGo） ─────────
+    approval: {
+      nineQuestions: [
+        { q: '市场够大吗？', a: '带灯款 $4,579万 / 占比 50.5%，体量充足', score: 5 },
+        { q: '增长趋势如何？', a: '带灯款 YoY +22%，色温可调子赛道更快', score: 4 },
+        { q: '竞争格局有空间吗？', a: 'CR5 67%，但 $120-160 高端中端有结构性空白', score: 4 },
+        { q: '我们有差异化优势吗？', a: '静音 + 5档色温可调双壁垒，雷达均分 4.7', score: 5 },
+        { q: '用户痛点真实且未满足？', a: '噪音差评 38%、色温单一 24%，痛点明确', score: 5 },
+        { q: '供应链可控吗？', a: '深圳私模 + DC 电机供应商导入中，交期 35 天', score: 4 },
+        { q: '盈利模型成立吗？', a: '毛利率 37.7%，首年 ROI 140%，回本 4.2 月', score: 4 },
+        { q: '合规 / 专利风险可控？', a: '私模无外观风险，FFO 检索 2 周完成，低风险', score: 4 },
+        { q: '团队 / 资源匹配吗？', a: '已有带灯款运营经验与色温可调技术积累', score: 4 },
+      ],
+      // 评分矩阵（加权）
+      scoreMatrix: [
+        { dim: '市场吸引力', weight: 25, score: 4.5 },
+        { dim: '竞争壁垒', weight: 25, score: 4.6 },
+        { dim: '盈利能力', weight: 20, score: 4.0 },
+        { dim: '执行可行性', weight: 15, score: 4.2 },
+        { dim: '风险可控性', weight: 15, score: 4.0 },
+      ],
+      decision: 'Go',
+      decisionNote: '综合加权得分 4.32 / 5，超过 Go 阈值 4.0。建议立项，优先推进方向 A（旗舰静音色温可调带灯排气扇）双 SKU。',
+    },
+  };
+}
+
+
+/* ===== js/charts.js ===== */
+// charts.js — 纯 SVG 图表引擎（无第三方依赖，离线可用）
+// 所有函数返回 SVG 字符串，由 slides.js 注入到幻灯片中。
+
+const PALETTE = ['#c8861a', '#2b6cb0', '#3f9b6b', '#b5546a', '#7b6cc0', '#d98841', '#5a9bd4'];
+const GRID = '#ece3d3';
+const AXIS = '#9a8e78';
+const INK = '#2a2318';
+
+const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+const num = (v) => (Number.isFinite(+v) ? +v : 0);
+
+function svgWrap(w, h, inner, cls = '') {
+  return `<svg class="chart ${cls}" viewBox="0 0 ${w} ${h}" preserveAspectRatio="xMidYMid meet" role="img">${inner}</svg>`;
+}
+
+/* ───────── 折线图（月度趋势） ───────── */
+function lineChart(data, opts = {}) {
+  const w = 760, h = 320, pad = { t: 24, r: 24, b: 46, l: 56 };
+  const pts = data.map((d) => ({ label: d.label, value: num(d.value) }));
+  if (!pts.length) return svgWrap(w, h, '');
+  const max = Math.max(...pts.map((p) => p.value)) * 1.12;
+  const min = Math.min(0, ...pts.map((p) => p.value));
+  const iw = w - pad.l - pad.r, ih = h - pad.t - pad.b;
+  const x = (i) => pad.l + (pts.length === 1 ? iw / 2 : (i / (pts.length - 1)) * iw);
+  const y = (v) => pad.t + ih - ((v - min) / (max - min || 1)) * ih;
+
+  let g = '';
+  // 网格 + Y 轴刻度
+  const ticks = 4;
+  for (let i = 0; i <= ticks; i++) {
+    const v = min + ((max - min) / ticks) * i;
+    const yy = y(v);
+    g += `<line x1="${pad.l}" y1="${yy}" x2="${w - pad.r}" y2="${yy}" stroke="${GRID}" stroke-width="1"/>`;
+    g += `<text x="${pad.l - 10}" y="${yy + 4}" text-anchor="end" font-size="12" fill="${AXIS}">${Math.round(v)}</text>`;
+  }
+  // 面积 + 折线
+  const line = pts.map((p, i) => `${x(i)},${y(p.value)}`).join(' ');
+  const area = `${pad.l},${y(min)} ${line} ${x(pts.length - 1)},${y(min)}`;
+  g += `<polygon points="${area}" fill="${PALETTE[0]}" opacity="0.10"/>`;
+  g += `<polyline points="${line}" fill="none" stroke="${PALETTE[0]}" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>`;
+  // 数据点 + X 轴标签
+  pts.forEach((p, i) => {
+    g += `<circle cx="${x(i)}" cy="${y(p.value)}" r="4" fill="#fff" stroke="${PALETTE[0]}" stroke-width="2.5"/>`;
+    const lbl = esc(p.label).replace(/^\d{4}-/, '');
+    g += `<text x="${x(i)}" y="${h - pad.b + 20}" text-anchor="middle" font-size="11" fill="${AXIS}">${lbl}</text>`;
+  });
+  // 峰值标注
+  const peak = pts.reduce((a, p, i) => (p.value > a.value ? { ...p, i } : a), { value: -Infinity, i: 0 });
+  g += `<text x="${x(peak.i)}" y="${y(peak.value) - 12}" text-anchor="middle" font-size="12" font-weight="700" fill="${PALETTE[0]}">${peak.value}</text>`;
+  if (opts.unit) g += `<text x="${pad.l}" y="14" font-size="11" fill="${AXIS}">${esc(opts.unit)}</text>`;
+  return svgWrap(w, h, g, 'chart-line');
+}
+
+/* ───────── 纵向柱状图 ───────── */
+function barChart(data, opts = {}) {
+  const w = 760, h = 320, pad = { t: 28, r: 20, b: 48, l: 48 };
+  const pts = data.map((d) => ({ label: d.label, value: num(d.value) }));
+  if (!pts.length) return svgWrap(w, h, '');
+  const max = Math.max(...pts.map((p) => p.value)) * 1.18 || 1;
+  const iw = w - pad.l - pad.r, ih = h - pad.t - pad.b;
+  const bw = (iw / pts.length) * 0.6;
+  const gap = (iw / pts.length) * 0.4;
+  let g = '';
+  for (let i = 0; i <= 4; i++) {
+    const yy = pad.t + ih - (ih / 4) * i;
+    g += `<line x1="${pad.l}" y1="${yy}" x2="${w - pad.r}" y2="${yy}" stroke="${GRID}"/>`;
+    g += `<text x="${pad.l - 8}" y="${yy + 4}" text-anchor="end" font-size="11" fill="${AXIS}">${Math.round((max / 4) * i)}</text>`;
+  }
+  pts.forEach((p, i) => {
+    const bh = (p.value / max) * ih;
+    const xx = pad.l + gap / 2 + i * (bw + gap);
+    const yy = pad.t + ih - bh;
+    const color = opts.color || PALETTE[i % PALETTE.length];
+    g += `<rect x="${xx}" y="${yy}" width="${bw}" height="${bh}" rx="4" fill="${color}"/>`;
+    g += `<text x="${xx + bw / 2}" y="${yy - 7}" text-anchor="middle" font-size="12" font-weight="700" fill="${INK}">${p.value}${opts.suffix || ''}</text>`;
+    g += `<text x="${xx + bw / 2}" y="${h - pad.b + 20}" text-anchor="middle" font-size="11.5" fill="${AXIS}">${esc(p.label)}</text>`;
+  });
+  return svgWrap(w, h, g, 'chart-bar');
+}
+
+/* ───────── 横向条形图（排名等） ───────── */
+function hBarChart(data, opts = {}) {
+  const rowH = 34, pad = { t: 14, r: 90, b: 14, l: 130 };
+  const w = 760;
+  const pts = data.map((d) => ({ label: d.label, value: num(d.value) }));
+  const h = pad.t + pad.b + pts.length * rowH;
+  const max = Math.max(...pts.map((p) => p.value), 1);
+  const iw = w - pad.l - pad.r;
+  let g = '';
+  pts.forEach((p, i) => {
+    const yy = pad.t + i * rowH + 5;
+    const bw = (p.value / max) * iw;
+    const color = opts.color || PALETTE[i % PALETTE.length];
+    g += `<text x="${pad.l - 10}" y="${yy + rowH / 2 - 2}" text-anchor="end" font-size="12.5" fill="${INK}">${esc(p.label)}</text>`;
+    g += `<rect x="${pad.l}" y="${yy}" width="${Math.max(bw, 2)}" height="${rowH - 12}" rx="4" fill="${color}"/>`;
+    g += `<text x="${pad.l + bw + 8}" y="${yy + rowH / 2 - 2}" font-size="12" font-weight="700" fill="${INK}">${opts.fmt ? opts.fmt(p.value) : p.value}</text>`;
+  });
+  return svgWrap(w, h, g, 'chart-hbar');
+}
+
+/* ───────── 环形图（细分占比） ───────── */
+function donutChart(data, opts = {}) {
+  const w = 360, h = 320, cx = 150, cy = 160, r = 110, ir = 64;
+  const pts = data.map((d) => ({ label: d.label, value: num(d.value) }));
+  const total = pts.reduce((s, p) => s + p.value, 0) || 1;
+  let a0 = -Math.PI / 2, g = '';
+  pts.forEach((p, i) => {
+    const a1 = a0 + (p.value / total) * Math.PI * 2;
+    const large = a1 - a0 > Math.PI ? 1 : 0;
+    const x0 = cx + r * Math.cos(a0), y0 = cy + r * Math.sin(a0);
+    const x1 = cx + r * Math.cos(a1), y1 = cy + r * Math.sin(a1);
+    const xi0 = cx + ir * Math.cos(a1), yi0 = cy + ir * Math.sin(a1);
+    const xi1 = cx + ir * Math.cos(a0), yi1 = cy + ir * Math.sin(a0);
+    const color = PALETTE[i % PALETTE.length];
+    g += `<path d="M${x0},${y0} A${r},${r} 0 ${large} 1 ${x1},${y1} L${xi0},${yi0} A${ir},${ir} 0 ${large} 0 ${xi1},${yi1} Z" fill="${color}"/>`;
+    a0 = a1;
+  });
+  g += `<text x="${cx}" y="${cy - 6}" text-anchor="middle" font-size="13" fill="${AXIS}">${esc(opts.centerLabel || '细分')}</text>`;
+  g += `<text x="${cx}" y="${cy + 18}" text-anchor="middle" font-size="20" font-weight="800" fill="${INK}">${esc(opts.centerValue || pts.length + ' 类')}</text>`;
+  // 图例
+  let ly = 40;
+  pts.forEach((p, i) => {
+    g += `<rect x="300" y="${ly - 11}" width="13" height="13" rx="3" fill="${PALETTE[i % PALETTE.length]}"/>`;
+    g += `<text x="320" y="${ly}" font-size="12.5" fill="${INK}">${esc(p.label)} ${((p.value / total) * 100).toFixed(1)}%</text>`;
+    ly += 26;
+  });
+  return svgWrap(720, h, `<g>${g}</g>`, 'chart-donut');
+}
+
+/* ───────── 雷达图（产品力 7 维对比） ───────── */
+function radarChart(dims, series, opts = {}) {
+  const w = 720, h = 380, cx = 210, cy = 190, R = 140, max = opts.max || 5;
+  const n = dims.length;
+  const ang = (i) => -Math.PI / 2 + (i / n) * Math.PI * 2;
+  const pt = (i, v) => [cx + (R * v) / max * Math.cos(ang(i)), cy + (R * v) / max * Math.sin(ang(i))];
+  let g = '';
+  // 同心网格
+  for (let ring = 1; ring <= 4; ring++) {
+    const rr = (R / 4) * ring;
+    const poly = dims.map((_, i) => `${cx + rr * Math.cos(ang(i))},${cy + rr * Math.sin(ang(i))}`).join(' ');
+    g += `<polygon points="${poly}" fill="none" stroke="${GRID}" stroke-width="1"/>`;
+  }
+  // 轴线 + 维度标签
+  dims.forEach((d, i) => {
+    const [ex, ey] = pt(i, max);
+    g += `<line x1="${cx}" y1="${cy}" x2="${ex}" y2="${ey}" stroke="${GRID}"/>`;
+    const lx = cx + (R + 22) * Math.cos(ang(i));
+    const ly = cy + (R + 22) * Math.sin(ang(i));
+    const anchor = Math.abs(lx - cx) < 12 ? 'middle' : lx > cx ? 'start' : 'end';
+    g += `<text x="${lx}" y="${ly + 4}" text-anchor="${anchor}" font-size="12.5" font-weight="600" fill="${INK}">${esc(d)}</text>`;
+  });
+  // 各系列多边形
+  series.forEach((s, si) => {
+    const color = s.color || PALETTE[si % PALETTE.length];
+    const poly = s.values.map((v, i) => pt(i, num(v)).join(',')).join(' ');
+    const isSelf = si === 0;
+    g += `<polygon points="${poly}" fill="${color}" fill-opacity="${isSelf ? 0.22 : 0.06}" stroke="${color}" stroke-width="${isSelf ? 3 : 1.6}"/>`;
+    if (isSelf) s.values.forEach((v, i) => { const [px, py] = pt(i, num(v)); g += `<circle cx="${px}" cy="${py}" r="3.5" fill="${color}"/>`; });
+  });
+  // 图例
+  let ly = 70;
+  series.forEach((s, si) => {
+    const color = s.color || PALETTE[si % PALETTE.length];
+    g += `<rect x="450" y="${ly - 11}" width="14" height="14" rx="3" fill="${color}" fill-opacity="${si === 0 ? 0.9 : 0.5}" stroke="${color}" stroke-width="1.5"/>`;
+    g += `<text x="472" y="${ly}" font-size="12.5" fill="${INK}">${esc(s.name)}${s.score != null ? `　<tspan font-weight="700">${s.score}</tspan>` : ''}</text>`;
+    ly += 28;
+  });
+  return svgWrap(w, h, g, 'chart-radar');
+}
+
+/* ───────── 甘特图（项目计划） ───────── */
+function ganttChart(milestones, totalWeeks) {
+  const rowH = 38, pad = { t: 40, r: 24, b: 16, l: 150 };
+  const w = 760;
+  const h = pad.t + pad.b + milestones.length * rowH;
+  const iw = w - pad.l - pad.r;
+  const cw = iw / totalWeeks;
+  let g = '';
+  // 周刻度
+  for (let wk = 0; wk <= totalWeeks; wk += 4) {
+    const xx = pad.l + wk * cw;
+    g += `<line x1="${xx}" y1="${pad.t - 8}" x2="${xx}" y2="${h - pad.b}" stroke="${GRID}"/>`;
+    g += `<text x="${xx}" y="${pad.t - 14}" text-anchor="middle" font-size="11" fill="${AXIS}">W${wk}</text>`;
+  }
+  milestones.forEach((m, i) => {
+    const yy = pad.t + i * rowH + 6;
+    const xx = pad.l + (m.start - 1) * cw;
+    const bw = Math.max((m.end - m.start + 1) * cw, 6);
+    const color = PALETTE[i % PALETTE.length];
+    g += `<text x="${pad.l - 12}" y="${yy + 16}" text-anchor="end" font-size="12" fill="${INK}">${esc(m.phase)}</text>`;
+    g += `<rect x="${xx}" y="${yy}" width="${bw}" height="${rowH - 16}" rx="5" fill="${color}" fill-opacity="0.88"/>`;
+    g += `<text x="${xx + bw + 6}" y="${yy + 16}" font-size="10.5" fill="${AXIS}">${esc(m.owner)}</text>`;
+  });
+  return svgWrap(w, h, g, 'chart-gantt');
+}
+
+/* ───────── 半圆仪表盘（评分 / ROI） ───────── */
+function gauge(value, max, opts = {}) {
+  const w = 240, h = 150, cx = 120, cy = 130, r = 96;
+  const pct = Math.max(0, Math.min(1, value / max));
+  const a = Math.PI * (1 - pct);
+  const x = cx + r * Math.cos(a), y = cy - r * Math.sin(a);
+  const arc = (sx, sy, ex, ey, large) => `M${sx},${sy} A${r},${r} 0 ${large} 1 ${ex},${ey}`;
+  const color = opts.color || (pct >= 0.8 ? PALETTE[2] : pct >= 0.6 ? PALETTE[0] : PALETTE[3]);
+  let g = '';
+  g += `<path d="${arc(cx - r, cy, cx + r, cy, 1)}" fill="none" stroke="${GRID}" stroke-width="16" stroke-linecap="round"/>`;
+  g += `<path d="${arc(cx - r, cy, x, y, pct > 0.5 ? 1 : 0)}" fill="none" stroke="${color}" stroke-width="16" stroke-linecap="round"/>`;
+  g += `<text x="${cx}" y="${cy - 12}" text-anchor="middle" font-size="30" font-weight="800" fill="${INK}">${opts.display ?? value}</text>`;
+  g += `<text x="${cx}" y="${cy + 12}" text-anchor="middle" font-size="12.5" fill="${AXIS}">${esc(opts.label || '')}</text>`;
+  return svgWrap(w, h, g, 'chart-gauge');
+}
+
+
+/* ===== js/store.js ===== */
+// store.js — 状态管理 + 数据存档系统
+// 当前工作数据自动保存到 localStorage；可保存为命名快照、恢复、删除、导出/导入 JSON。
+
+
+const KEY_CURRENT = 'amico-lxb:current:v1';
+const KEY_ARCHIVES = 'amico-lxb:archives:v1';
+
+const clone = (o) => JSON.parse(JSON.stringify(o));
+const uid = () => 'a' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+
+function readJSON(key, fallback) {
+  try {
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : fallback;
+  } catch {
+    return fallback;
+  }
+}
+function writeJSON(key, val) {
+  try {
+    localStorage.setItem(key, JSON.stringify(val));
+    return true;
+  } catch (e) {
+    console.warn('存储失败', e);
+    return false;
+  }
+}
+
+class Store {
+  constructor() {
+    const stored = readJSON(KEY_CURRENT, null);
+    this.state = stored || buildDefaultData();
+    this.archives = readJSON(KEY_ARCHIVES, []);
+    this._subs = new Set();
+    if (!stored) this.persist(); // 首次加载即落盘默认数据，保证当前数据始终可导出/恢复
+  }
+
+  /* ── 订阅 / 渲染 ── */
+  subscribe(fn) { this._subs.add(fn); return () => this._subs.delete(fn); }
+  emit() { this._subs.forEach((fn) => fn(this.state)); }
+
+  /* ── 当前数据自动保存 ── */
+  persist() { writeJSON(KEY_CURRENT, this.state); }
+
+  /** 按点路径更新字段，如 set('meta.brand', 'Amico') */
+  set(path, value) {
+    const keys = path.split('.');
+    let o = this.state;
+    for (let i = 0; i < keys.length - 1; i++) o = o[keys[i]];
+    o[keys[keys.length - 1]] = value;
+    this.persist();
+    this.emit();
+  }
+
+  get(path) {
+    return path.split('.').reduce((o, k) => (o == null ? o : o[k]), this.state);
+  }
+
+  /* ── 存档（快照）管理 ── */
+  saveArchive(name, note = '') {
+    const snap = {
+      id: uid(),
+      name: name || `存档 ${this.archives.length + 1}`,
+      note,
+      time: new Date().toISOString(),
+      schema: SCHEMA_VERSION,
+      data: clone(this.state),
+    };
+    this.archives.unshift(snap);
+    writeJSON(KEY_ARCHIVES, this.archives);
+    return snap;
+  }
+
+  listArchives() { return this.archives; }
+
+  restoreArchive(id) {
+    const snap = this.archives.find((a) => a.id === id);
+    if (!snap) return false;
+    this.state = clone(snap.data);
+    this.persist();
+    this.emit();
+    return true;
+  }
+
+  deleteArchive(id) {
+    this.archives = this.archives.filter((a) => a.id !== id);
+    writeJSON(KEY_ARCHIVES, this.archives);
+  }
+
+  renameArchive(id, name) {
+    const snap = this.archives.find((a) => a.id === id);
+    if (snap) { snap.name = name; writeJSON(KEY_ARCHIVES, this.archives); }
+  }
+
+  /* ── 重置 ── */
+  resetToDefault() {
+    this.state = buildDefaultData();
+    this.persist();
+    this.emit();
+  }
+
+  /* ── 导出 / 导入 ── */
+  exportCurrent() {
+    return JSON.stringify(
+      { type: 'amico-lxb-report', schema: SCHEMA_VERSION, exportedAt: new Date().toISOString(), data: this.state },
+      null, 2,
+    );
+  }
+
+  exportAll() {
+    return JSON.stringify(
+      { type: 'amico-lxb-bundle', schema: SCHEMA_VERSION, exportedAt: new Date().toISOString(), current: this.state, archives: this.archives },
+      null, 2,
+    );
+  }
+
+  /** 导入：支持单报告(data) 或 整包(current+archives)。返回 {ok, msg} */
+  importJSON(text) {
+    let obj;
+    try { obj = JSON.parse(text); } catch { return { ok: false, msg: 'JSON 解析失败，文件格式不正确' }; }
+    if (obj.type === 'amico-lxb-bundle') {
+      if (obj.current) this.state = obj.current;
+      if (Array.isArray(obj.archives)) { this.archives = obj.archives; writeJSON(KEY_ARCHIVES, this.archives); }
+    } else if (obj.data) {
+      this.state = obj.data;
+    } else if (obj.meta) {
+      this.state = obj; // 裸数据对象
+    } else {
+      return { ok: false, msg: '无法识别的文件结构（缺少 data / meta 字段）' };
+    }
+    this.persist();
+    this.emit();
+    return { ok: true, msg: '导入成功' };
+  }
+}
+
+const store = new Store();
+
+
+/* ===== js/slides.js ===== */
+// slides.js — 根据数据构建 9 章立项 PPT 幻灯片
+
+const CHAPTERS = [
+  { n: 1, name: '产品概要', icon: '📦' },
+  { n: 2, name: '看市场', icon: '📊' },
+  { n: 3, name: '看竞争', icon: '⚔️' },
+  { n: 4, name: '看用户', icon: '💬' },
+  { n: 5, name: '看自己', icon: '🪞' },
+  { n: 6, name: '定产品', icon: '🎯' },
+  { n: 7, name: '定策略', icon: '💰' },
+  { n: 8, name: '定计划', icon: '🗓️' },
+  { n: 9, name: '立项评审', icon: '✅' },
+];
+
+const e = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+const fmtWan = (v) => `$${(+v).toLocaleString()}万`;
+const stars = (n) => '★'.repeat(n) + '☆'.repeat(5 - n);
+
+/* ── 可编辑文本 ── */
+function ed(path, value, cls = '') {
+  return `<span class="editable ${cls}" data-path="${path}" tabindex="0" title="点击编辑">${e(value)}</span>`;
+}
+
+/* ── 幻灯片头部（Action Title = 结论句） ── */
+function head(ch, action, sub = '') {
+  const c = CHAPTERS.find((x) => x.n === ch);
+  return `<div class="slide-head">
+    <div class="slide-kicker"><span class="kdot">${c.icon}</span> 第 ${ch} 章 · ${c.name}</div>
+    <h2 class="action-title">${action}</h2>
+    ${sub ? `<p class="slide-sub">${sub}</p>` : ''}
+  </div>`;
+}
+
+/* ── KPI 卡片组 ── */
+function kpiCards(items) {
+  return `<div class="kpi-grid">${items.map((k) => `
+    <div class="kpi-card">
+      <div class="kpi-label">${e(k.label)}</div>
+      <div class="kpi-value">${e(k.value)}<span class="kpi-unit">${e(k.unit || '')}</span></div>
+      <div class="kpi-sub">${e(k.sub || '')}</div>
+    </div>`).join('')}</div>`;
+}
+
+/* ── 通用表格 ── */
+function table(cols, rows, opts = {}) {
+  const align = opts.align || [];
+  return `<table class="data-table ${opts.cls || ''}">
+    <thead><tr>${cols.map((c, i) => `<th style="text-align:${align[i] || 'left'}">${e(c)}</th>`).join('')}</tr></thead>
+    <tbody>${rows.map((r) => `<tr>${r.map((cell, i) => `<td style="text-align:${align[i] || 'left'}">${cell}</td>`).join('')}</tr>`).join('')}</tbody>
+  </table>`;
+}
+
+/* ── 热力矩阵表（竞品参数 / 价格段覆盖） ── */
+function heatTable(cols, rows) {
+  const allVals = rows.flatMap((r) => r.d);
+  const max = Math.max(...allVals, 1);
+  const body = rows.map((r) => `<tr>
+    <td class="ht-brand">${e(r.brand)}</td>
+    ${r.d.map((v) => {
+      const t = v / max;
+      const bg = `rgba(200,134,26,${(0.10 + t * 0.62).toFixed(2)})`;
+      return `<td class="ht-cell" style="background:${bg};color:${t > 0.55 ? '#fff' : '#2a2318'}">${v}</td>`;
+    }).join('')}
+  </tr>`).join('');
+  return `<table class="data-table heat-table">
+    <thead><tr><th>品牌 \\ 维度</th>${cols.map((c) => `<th style="text-align:center">${e(c)}</th>`).join('')}</tr></thead>
+    <tbody>${body}</tbody></table>`;
+}
+
+/* ── 决策节点（人工确认门） ── */
+function gate(key, title, desc, valueLabel, gateState) {
+  const ok = gateState.status === 'confirmed';
+  return `<div class="gate ${ok ? 'gate-ok' : 'gate-wait'}" data-gate="${key}">
+    <div class="gate-top">
+      <span class="gate-icon">${ok ? '✔' : '⏳'}</span>
+      <span class="gate-title">${e(title)}</span>
+      <span class="gate-pill">${ok ? '已确认' : '等待确认'}</span>
+    </div>
+    <p class="gate-desc">${desc}</p>
+    <div class="gate-value">确认结果：<strong>${ed(`meta.gates.${key}.value`, gateState.value)}</strong>${gateState.assist ? ` ｜ 辅助：${ed(`meta.gates.${key}.assist`, gateState.assist)}` : ''} <span class="gate-time">${e(gateState.time || '')}</span></div>
+  </div>`;
+}
+
+function chip(text, kind = '') { return `<span class="chip ${kind}">${e(text)}</span>`; }
+
+/* ════════════════════════════════════════════════
+   构建全部幻灯片
+   ════════════════════════════════════════════════ */
+function buildSlides(s) {
+  const slides = [];
+  const push = (ch, body) => slides.push({ ch, body });
+
+  /* ───── 封面 ───── */
+  slides.push({
+    ch: 0, cover: true,
+    body: `<div class="cover">
+      <div class="cover-badge">亚马逊选品立项报告 · ${e(s.meta.reportVersion)}</div>
+      <h1 class="cover-title">${ed('meta.title', s.meta.title)}</h1>
+      <div class="cover-meta">
+        <div><span>品类</span>${ed('meta.category', s.meta.category)}</div>
+        <div><span>己品品牌</span>${ed('meta.brand', s.meta.brand)}</div>
+        <div><span>编制</span>${ed('meta.author', s.meta.author)}</div>
+        <div><span>日期</span>${ed('meta.date', s.meta.date)}</div>
+      </div>
+      <div class="cover-gates">
+        ${gate('brand', '己品品牌确认', '后续「看自己 / 定产品 / 定策略」均以该品牌为己品展开。', s.meta.brand, s.meta.gates.brand)}
+        ${gate('segment', '主攻细分确认', '确认后第 3–9 章全部锁定在该细分内，不出现其他细分数据。', s.meta.gates.segment.value, s.meta.gates.segment)}
+        ${gate('direction', '产品方向确认', '确认后「定策略 / 定计划 / 立项评审」围绕该方向展开。', s.meta.gates.direction.value, s.meta.gates.direction)}
+      </div>
+    </div>`,
+  });
+
+  /* ───── 工作流总览 ───── */
+  push(0, `${head(0 || 1, '九步工作流：从市场洞察到 Go / NoGo 立项决策').replace('第 1 章 · 产品概要', '工作流总览')}
+    <div class="flow">${CHAPTERS.map((c, i) => `
+      <div class="flow-node">
+        <div class="flow-n">${c.n}</div>
+        <div class="flow-ico">${c.icon}</div>
+        <div class="flow-name">${c.name}</div>
+        ${[2, 6].includes(c.n) ? `<div class="flow-gate">⏳ 确认节点</div>` : ''}
+      </div>${i < CHAPTERS.length - 1 ? '<div class="flow-arrow">→</div>' : ''}`).join('')}
+    </div>
+    <div class="note-row">
+      ${chip('规则1：细分确认后第 3–9 章锁定该细分', 'good')}
+      ${chip('规则2：方向确认后第 7–9 章锁定该方向', 'good')}
+      ${chip('规则3：数据隔离，不使用未确认细分/方向', 'good')}
+    </div>`);
+
+  /* ═══ 第 1 章 产品概要 ═══ */
+  const ov = s.overview;
+  push(1, `${head(1, `${e(ov.definition.name)}是解决「${e(ov.definition.func)}」的刚需家电，分四大细分`)}
+    <div class="two-col">
+      <div>
+        <div class="def-card">
+          <div class="def-row"><span>产品名称</span>${ed('overview.definition.name', ov.definition.name)} / ${e(ov.definition.nameEn)}</div>
+          <div class="def-row"><span>核心功能</span>${ed('overview.definition.func', ov.definition.func)}</div>
+          <div class="def-row"><span>应用场景</span>${ed('overview.definition.scene', ov.definition.scene)}</div>
+        </div>
+        ${table(['细分', 'ASIN数', '销量占比', '销额占比', '均价'],
+          ov.classes.map((c) => [e(c.name), c.asin, c.salesShare + '%', `<strong>${c.revShare}%</strong>`, '$' + c.avgPrice]),
+          { align: ['left', 'right', 'right', 'right', 'right'] })}
+      </div>
+      <div>${donutChart(ov.classes.map((c) => ({ label: c.name, value: c.revShare })), { centerLabel: '销额占比', centerValue: '4 细分' })}</div>
+    </div>`);
+
+  push(1, `${head(1, '买家最关注 6 大核心参数，关键词体系覆盖大词 + 长尾 + 属性词')}
+    <div class="two-col">
+      <div>
+        <h4 class="blk-title">核心参数维度</h4>
+        ${table(['参数维度', '说明', '呈现方式'], ov.params.map((p) => [`<strong>${e(p.dim)}</strong>`, e(p.desc), e(p.viz)]))}
+      </div>
+      <div>
+        <h4 class="blk-title">关键词体系</h4>
+        <div class="kw-block"><span class="kw-tag">核心大词</span><div>${ov.keywords.core.map((k) => chip(k)).join('')}</div></div>
+        <div class="kw-block"><span class="kw-tag">长尾词</span><div>${ov.keywords.longtail.map((k) => chip(k)).join('')}</div></div>
+        <div class="kw-block"><span class="kw-tag">属性词</span><div>${ov.keywords.attr.map((k) => chip(k, 'good')).join('')}</div></div>
+        <div class="kw-block"><span class="kw-tag">品牌词</span><div>${ov.keywords.brand.map((k) => chip(k, 'muted')).join('')}</div></div>
+      </div>
+    </div>`);
+
+  /* ═══ 第 2 章 看市场 ═══ */
+  const mk = s.market;
+  push(2, `${head(2, `${fmtWan(9071)} 市场体量、近 12 月销量 +18%，春季装修旺季驱动增长`)}
+    ${kpiCards(mk.kpis)}`);
+
+  push(2, `${head(2, '销额呈明显季节性：3–5 月装修旺季为全年高峰，12 月触底')}
+    ${lineChart(mk.trend.map((t) => ({ label: t.month, value: t.rev })), { unit: '万美元 / 月' })}`);
+
+  push(2, `${head(2, '$50–100 是主力价格段（销量 41%），80–110CFM + ≤1.0sone 为主流参数')}
+    <div class="two-col">
+      <div>
+        <h4 class="blk-title">价格段分布</h4>
+        ${barChart(mk.priceDist.map((p) => ({ label: p.range, value: p.volShare })), { suffix: '%', color: PALETTE[1] })}
+      </div>
+      <div>
+        <h4 class="blk-title">CFM 风量分布</h4>
+        ${barChart(mk.cfmDist.map((p) => ({ label: p.range, value: p.share })), { suffix: '%', color: PALETTE[2] })}
+        <h4 class="blk-title" style="margin-top:14px">噪音 sone 分布</h4>
+        ${table(mk.soneDist.map((x) => x.range), [mk.soneDist.map((x) => `<strong>${x.share}%</strong>`)], { align: mk.soneDist.map(() => 'center') })}
+      </div>
+    </div>`);
+
+  push(2, `${head(2, 'AI 推荐主攻【带灯款】★★★★★：体量最大 + 己品已有布局 + 色温可调蓝海', '细分优先度评估 — 等待人工确认')}
+    <div class="two-col">
+      <div>${table(['细分', '销额', '占比', '增速', '评级', '建议策略'],
+        mk.segments.map((g) => [
+          `<strong>${e(g.name)}</strong>`, fmtWan(g.rev), g.revShare + '%',
+          `<span class="up">+${g.growth}%</span>`, `<span class="stars">${stars(g.stars)}</span>`, e(g.strategy),
+        ]), { align: ['left', 'right', 'right', 'right', 'left', 'left'] })}
+      </div>
+      <div>${donutChart(mk.segments.map((g) => ({ label: g.name, value: g.rev })), { centerLabel: '细分销额', centerValue: fmtWan(9071) })}</div>
+    </div>
+    ${gate('segment', '主攻细分确认', '确认后第 3–9 章全部锁定该细分；竞品/用户/产品定义均不出现其他细分数据。', mk.segments[0].name, s.meta.gates.segment)}`);
+
+  /* ═══ 第 3 章 看竞争 ═══ */
+  const cp = s.competitor;
+  push(3, `${head(3, `带灯款 CR5=${cp.cr5}%，Broan / Panasonic 双寡头，$120–160 中高端存在空白`, '品牌排名 TOP10（已排除己品 Amico）')}
+    <div class="two-col">
+      <div>${hBarChart(cp.brandRank.slice(0, 8).map((b) => ({ label: b.brand, value: b.rev })), { fmt: (v) => fmtWan(v), color: PALETTE[0] })}</div>
+      <div>${table(['#', '品牌', '销额', 'ASIN', '均价', '市占'],
+        cp.brandRank.map((b) => [b.rank, `<strong>${e(b.brand)}</strong>`, fmtWan(b.rev), b.asin, '$' + b.avgPrice, b.share + '%']),
+        { align: ['center', 'left', 'right', 'right', 'right', 'right'] })}
+        <div class="note-row">${chip('CR5 = ' + cp.cr5 + '%')}${chip('CR10 = ' + cp.cr10 + '%')}</div>
+      </div>
+    </div>`);
+
+  push(3, `${head(3, '竞品主力集中 $80–120，静音 + 色温可调是 Broan 盲区 → 己品差异化窗口')}
+    <div class="two-col">
+      <div><h4 class="blk-title">价格段 ASIN 布局</h4>${heatTable(cp.priceLayoutCols, cp.priceLayout)}
+        <h4 class="blk-title" style="margin-top:14px">核心参数覆盖</h4>${heatTable(cp.paramMatrixCols, cp.paramMatrix)}</div>
+      <div><h4 class="blk-title">布局洞察</h4>
+        ${cp.insights.map((t, i) => `<div class="insight"><span class="insight-n">${i + 1}</span>${e(t)}</div>`).join('')}
+      </div>
+    </div>`);
+
+  push(3, `${head(3, 'Broan 走量但创新滞后、Panasonic 高端静音但贵 → 己品错位卡位')}
+    <div class="two-col">${cp.companies.map((c) => `
+      <div class="company-card">
+        <div class="company-head"><strong>${e(c.name)}</strong><span class="chip muted">${e(c.positioning)}</span></div>
+        <div class="company-meta">${c.founded} · ${e(c.hq)} · ${e(c.parent)}</div>
+        <div class="company-kpis">
+          <div><b>${c.asin}</b><span>ASIN</span></div>
+          <div><b>${fmtWan(c.rev)}</b><span>年销额</span></div>
+          <div><b>$${c.avgPrice}</b><span>均价</span></div>
+          <div><b>${c.share}%</b><span>市占</span></div>
+        </div>
+        <div class="sw-line good">优势：${e(c.pros)}</div>
+        <div class="sw-line bad">劣势：${e(c.cons)}</div>
+        <div class="sw-line tip">💡 启示：${e(c.insight)}</div>
+      </div>`).join('')}</div>`);
+
+  const bp = cp.bestParent;
+  push(3, `${head(3, `标杆父体 ${e(bp.name)}：${bp.params}，4.5 星 / 退货率仅 4.2%`, `ASIN ${e(bp.asin)} · 年销额 ${fmtWan(bp.rev)} · 售价 $${bp.price}`)}
+    <div class="two-col">
+      <div>${table(['维度', '参数/表现', '评论反馈'], bp.rows.map((r) => [`<strong>${e(r.dim)}</strong>`, e(r.spec), e(r.voc)]))}</div>
+      <div><h4 class="blk-title">成功因素</h4>${bp.success.map((t, i) => `<div class="insight"><span class="insight-n">${i + 1}</span>${e(t)}</div>`).join('')}</div>
+    </div>`);
+
+  /* ═══ 第 4 章 看用户 ═══ */
+  const us = s.user;
+  push(4, `${head(4, '静音(好评34%)与灯光是核心买点；噪音(差评38%)与色温单一是首要痛点')}
+    <div class="two-col">
+      <div><h4 class="blk-title good">好评 TOP（占比）</h4>${us.pros.map((p) => `
+        <div class="voc-bar"><span class="voc-dim">${e(p.dim)}</span><div class="voc-track"><div class="voc-fill good" style="width:${p.share}%"></div></div><span class="voc-pct">${p.share}%</span></div>
+        <div class="voc-note">${e(p.note)}</div>`).join('')}</div>
+      <div><h4 class="blk-title bad">差评 TOP（占比）</h4>${us.cons.map((p) => `
+        <div class="voc-bar"><span class="voc-dim">${e(p.dim)}</span><div class="voc-track"><div class="voc-fill bad" style="width:${p.share}%"></div></div><span class="voc-pct">${p.share}%</span></div>
+        <div class="voc-note">${e(p.note)}</div>`).join('')}</div>
+    </div>
+    <div class="callout">📌 参数临界值：${e(us.criticalInsight)}</div>`);
+
+  /* ═══ 第 5 章 看自己 ═══ */
+  const sf = s.self;
+  push(5, `${head(5, `己品 ${e(s.meta.brand)} 带灯款已有布局，优势在色温可调 + 私模供应链，需补静音短板`)}
+    <div class="two-col">
+      <div>
+        <h4 class="blk-title">己品带灯款产品线</h4>
+        ${table(['SKU', '售价', '年销额', '状态'], sf.productLine.map((p) => [e(p.sku), '$' + p.price, fmtWan(p.rev), chip(p.status, 'good')]), { align: ['left', 'right', 'right', 'center'] })}
+        <div class="callout sm">🏭 供应链：${e(sf.supplyChain)}</div>
+      </div>
+      <div>
+        <h4 class="blk-title">SWOT 分析</h4>
+        <div class="swot">
+          <div class="swot-q s"><b>S 优势</b><ul>${sf.swot.S.map((x) => `<li>${e(x)}</li>`).join('')}</ul></div>
+          <div class="swot-q w"><b>W 劣势</b><ul>${sf.swot.W.map((x) => `<li>${e(x)}</li>`).join('')}</ul></div>
+          <div class="swot-q o"><b>O 机会</b><ul>${sf.swot.O.map((x) => `<li>${e(x)}</li>`).join('')}</ul></div>
+          <div class="swot-q t"><b>T 威胁</b><ul>${sf.swot.T.map((x) => `<li>${e(x)}</li>`).join('')}</ul></div>
+        </div>
+      </div>
+    </div>`);
+
+  /* ═══ 第 6 章 定产品 ═══ */
+  const pd = s.product;
+  push(6, `${head(6, 'SWOT 交叉推导出 3 个方向，全部位于【带灯款】内，覆盖巩固/走量/突破三路径')}
+    <div class="cross-grid">${pd.swotCross.map((c) => `
+      <div class="cross-card">
+        <div class="cross-combo">${e(c.combo)}</div>
+        <div class="cross-mean">${e(c.meaning)}</div>
+        <div class="cross-dir">${e(c.dir)}</div>
+      </div>`).join('')}</div>`);
+
+  pd.directions.forEach((d) => {
+    const series = [
+      { name: d.benchNames[0], values: d.radar.map((r) => r.self), score: d.benchScore[0], color: PALETTE[0] },
+      { name: d.benchNames[1], values: d.radar.map((r) => r.c1), score: d.benchScore[1], color: PALETTE[1] },
+      { name: d.benchNames[2], values: d.radar.map((r) => r.c2), score: d.benchScore[2], color: PALETTE[4] },
+      { name: d.benchNames[3], values: d.radar.map((r) => r.c3), score: d.benchScore[3], color: PALETTE[5] },
+    ];
+    push(6, `${head(6, `方向 ${d.id}：${e(d.name)} — 雷达综合均分 ${d.score}（对标 ${d.benchScore.slice(1).join('/')}）`, `${d.rec} · <span class="stars">${stars(d.stars)}</span>`)}
+      <div class="two-col">
+        <div>
+          ${table(['定义维度', '内容'], [
+            ['目标价格段', `<strong>${e(d.price)}</strong>（目标 $${d.target}）`],
+            ['核心参数', e(d.params)],
+            ['用户类型', e(d.userType)],
+            ['目标用户', e(d.users)],
+            ['差异化卖点', `<strong>${e(d.selling)}</strong>`],
+            ['与己品关联', e(d.link)],
+            ['预期月销量', `${d.expSales} 件`],
+          ])}
+        </div>
+        <div>${radarChart(d.radar.map((r) => r.dim), series)}</div>
+      </div>`);
+  });
+
+  const A = pd.directions[0];
+  push(6, `${head(6, `已确认方向 A，生成双 SKU 产品定义表，专利风险评估为${e(pd.patent.risk)}`, '产品方向选择 — 等待人工确认')}
+    ${gate('direction', '产品方向确认', '确认后「定策略 / 定计划 / 立项评审」均围绕该方向展开，财务与风险与之绑定。', 'A', s.meta.gates.direction)}
+    <div class="two-col" style="margin-top:14px">
+      <div><h4 class="blk-title">产品定义表（方向 A 双 SKU）</h4>
+        ${table(pd.defTable.cols, pd.defTable.rows.map((r) => r.map((c, i) => i === 0 ? `<strong>${e(c)}</strong>` : e(c))), { cls: 'compact' })}</div>
+      <div><h4 class="blk-title">专利排查与风险分析</h4>
+        <div class="patent-row"><span>外观专利</span>${e(pd.patent.appearance)}</div>
+        <div class="patent-row"><span>发明专利</span>${e(pd.patent.invention)}</div>
+        <div class="patent-row"><span>风险等级</span>${chip(pd.patent.risk, 'good')}</div>
+        <div class="patent-row"><span>行动计划</span>${e(pd.patent.action)}</div>
+        <div class="callout sm" style="margin-top:12px">🎯 核心卖点：${e(A.selling)} ｜ ${e(A.params)}</div>
+      </div>
+    </div>`);
+
+  /* ═══ 第 7 章 定策略 ═══ */
+  const st = s.strategy;
+  const totalCost = st.costRows.reduce((a, c) => a + c.value, 0);
+  push(7, `${head(7, `方向 A 售价 $${st.price}，毛利率 ${st.grossMargin}%，首年 ROI ${st.roi.roiPct}%，${st.roi.payback} 月回本`)}
+    <div class="three-col">
+      <div><h4 class="blk-title">单件成本结构（$）</h4>
+        ${table(['成本项', '金额', '说明'], st.costRows.map((c) => [e(c.item), '$' + c.value, e(c.note)]), { align: ['left', 'right', 'left'] })}
+        <div class="cost-sum">总成本 $${totalCost.toFixed(1)} ｜ 单件毛利 <strong>$${(st.price - totalCost).toFixed(1)}</strong></div>
+      </div>
+      <div class="center-col">
+        ${gauge(st.grossMargin, 100, { display: st.grossMargin + '%', label: '毛利率', color: PALETTE[2] })}
+        ${gauge(st.roi.roiPct, 200, { display: st.roi.roiPct + '%', label: '首年 ROI', color: PALETTE[0] })}
+      </div>
+      <div><h4 class="blk-title">盈亏平衡 & 首年测算</h4>
+        ${table(['指标', '值'], [
+          ['固定投入', `$${st.breakeven.fixedInvest}万`],
+          ['盈亏平衡月销量', `<strong>${st.breakeven.monthlyUnit} 件</strong>`],
+          ['月销目标', `${st.roi.monthlyTarget} 件`],
+          ['单件净利', `$${st.roi.unitProfit}`],
+          ['首年销量', `${st.roi.year1Sales.toLocaleString()} 件`],
+          ['首年销额', `$${st.roi.year1Revenue}万`],
+          ['首年净利', `<strong>$${st.roi.year1Profit}万</strong>`],
+          ['回本周期', `${st.roi.payback} 月`],
+        ], { align: ['left', 'right'] })}
+        <div class="callout sm">${e(st.breakeven.note)}</div>
+      </div>
+    </div>`);
+
+  /* ═══ 第 8 章 定计划 ═══ */
+  const tl = s.timeline;
+  push(8, `${head(8, `方向 A 开发周期 ${tl.totalWeeks} 周：开模→认证→量产→上架→推广爬升`)}
+    ${ganttChart(tl.milestones, tl.totalWeeks)}
+    <div class="note-row">
+      ${chip('关键路径：开模(W3) → 认证(W10) → 量产(W13) → 上架(W17)', 'good')}
+      ${chip('认证 ETL/HVI 与 DVT 并行以压缩周期')}
+    </div>`);
+
+  /* ═══ 第 9 章 立项评审 ═══ */
+  const ap = s.approval;
+  push(9, `${head(9, '立项九问全部正向，9 项均分 4.3 / 5，无致命短板')}
+    <div class="nine-grid">${ap.nineQuestions.map((q, i) => `
+      <div class="nine-card">
+        <div class="nine-q"><span class="nine-n">Q${i + 1}</span>${e(q.q)}</div>
+        <div class="nine-a">${e(q.a)}</div>
+        <div class="nine-score">${'●'.repeat(q.score)}${'○'.repeat(5 - q.score)} <b>${q.score}</b></div>
+      </div>`).join('')}</div>`);
+
+  const weighted = ap.scoreMatrix.reduce((a, m) => a + (m.weight / 100) * m.score, 0);
+  push(9, `${head(9, `加权综合得分 ${weighted.toFixed(2)} / 5 ≥ Go 阈值 4.0 → 决策【${ap.decision}】`, '立项决策矩阵')}
+    <div class="two-col">
+      <div>${table(['评估维度', '权重', '得分', '加权'], ap.scoreMatrix.map((m) => [
+        `<strong>${e(m.dim)}</strong>`, m.weight + '%', m.score.toFixed(1),
+        `<div class="mini-bar"><div style="width:${(m.score / 5) * 100}%"></div></div>`,
+      ]), { align: ['left', 'center', 'center', 'left'] })}
+        <div class="cost-sum">加权总分 <strong>${weighted.toFixed(2)} / 5</strong></div>
+      </div>
+      <div class="decision-col">
+        <div class="decision-badge ${ap.decision === 'Go' ? 'go' : 'nogo'}">${e(ap.decision)}</div>
+        <p class="decision-note">${e(ap.decisionNote)}</p>
+      </div>
+    </div>`);
+
+  return slides;
+}
+
+
+/* ===== js/main.js ===== */
+// main.js — 控制器：视图切换、键盘导航、字段编辑、决策门、数据存档抽屉、PDF 导出
+
+const DESIGN_W = 1280, DESIGN_H = 720;
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+let view = 'board';   // 'board' | 'deck'
+let idx = 0;          // 当前幻灯片索引（演示模式），0 = 封面
+let slides = [];
+
+const stage = $('#stage');
+const side = $('#side');
+
+/* ───────── 渲染入口 ───────── */
+function render() {
+  slides = buildSlides(store.state);
+  idx = Math.max(0, Math.min(idx, slides.length - 1));
+  $('#tbSub').textContent = `${store.state.meta.category} · ${store.state.meta.brand}`;
+  $$('.seg-btn').forEach((b) => b.classList.toggle('is-on', b.dataset.view === view));
+  renderSide();
+  view === 'board' ? renderBoard() : renderDeck();
+}
+
+/* 把幻灯片 HTML 包进固定 1280×720 画布 */
+function canvas(html) {
+  return `<div class="slide-frame"><div class="slide-canvas">${html}</div></div>`;
+}
+
+/* 缩放画布以适配容器宽度 */
+function fitFrames(root = document) {
+  $$('.slide-frame', root).forEach((frame) => {
+    const w = frame.clientWidth;
+    const s = w / DESIGN_W;
+    const cv = frame.firstElementChild;
+    cv.style.transform = `scale(${s})`;
+    frame.style.height = `${DESIGN_H * s}px`;
+  });
+}
+
+/* ── 看板视图：全部幻灯片缩略图，按章分组 ── */
+function renderBoard() {
+  const groups = new Map();
+  slides.forEach((sl, i) => {
+    const key = sl.cover ? 0 : sl.ch;
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push({ sl, i });
+  });
+  let html = '';
+  for (const [ch, items] of groups) {
+    const c = CHAPTERS.find((x) => x.n === ch);
+    const label = ch === 0 ? '封面 · 工作流总览' : `${c.icon} 第 ${ch} 章 · ${c.name}`;
+    html += `<div class="board-group"><div class="board-group-title">${label} <span>${items.length} 页</span></div>
+      <div class="board-grid">${items.map(({ sl, i }) => `
+        <button class="thumb" data-goto="${i}" aria-label="第 ${i + 1} 页">
+          ${canvas(sl.body)}
+          <span class="thumb-no">${i + 1}</span>
+        </button>`).join('')}</div></div>`;
+  }
+  stage.className = 'stage stage-board';
+  stage.innerHTML = html;
+  fitFrames(stage);
+}
+
+/* ── 演示视图：单页大图 + 控制 ── */
+function renderDeck() {
+  const sl = slides[idx];
+  stage.className = 'stage stage-deck';
+  stage.innerHTML = `
+    <div class="deck-wrap">
+      <div class="deck-stage">${canvas(sl.body)}</div>
+      <div class="deck-bar">
+        <button class="nav-btn" data-nav="-1" ${idx === 0 ? 'disabled' : ''}>‹ 上一页</button>
+        <span class="deck-count">${idx + 1} / ${slides.length}</span>
+        <button class="nav-btn" data-nav="1" ${idx === slides.length - 1 ? 'disabled' : ''}>下一页 ›</button>
+      </div>
+    </div>`;
+  fitFrames(stage);
+}
+
+/* ── 侧栏：章节大纲 ── */
+function renderSide() {
+  let html = '<div class="side-head">章节大纲</div>';
+  let lastCh = null;
+  slides.forEach((sl, i) => {
+    const ch = sl.cover ? 0 : sl.ch;
+    if (ch !== lastCh) {
+      const c = CHAPTERS.find((x) => x.n === ch);
+      html += `<div class="side-ch">${ch === 0 ? '◆ 封面 / 总览' : `${c.icon} ${ch}. ${c.name}`}</div>`;
+      lastCh = ch;
+    }
+    const title = sl.cover ? '封面' : (sl.body.match(/action-title">(.*?)<\/h2>/)?.[1] || `第 ${i + 1} 页`).replace(/<[^>]+>/g, '');
+    html += `<button class="side-item ${i === idx && view === 'deck' ? 'is-cur' : ''}" data-goto="${i}">
+      <span class="side-no">${i + 1}</span><span class="side-t">${title}</span></button>`;
+  });
+  side.innerHTML = html;
+}
+
+/* ───────── 导航 ───────── */
+function goto(i, toDeck = true) {
+  idx = Math.max(0, Math.min(i, slides.length - 1));
+  if (toDeck) view = 'deck';
+  render();
+}
+function nav(d) { goto(idx + d); }
+
+/* ───────── 字段编辑（contenteditable） ───────── */
+function startEdit(el) {
+  if (el.isContentEditable) return;
+  el.contentEditable = 'true';
+  el.classList.add('editing');
+  const r = document.createRange();
+  r.selectNodeContents(el);
+  const sel = getSelection();
+  sel.removeAllRanges(); sel.addRange(r);
+  el.focus();
+  const commit = () => {
+    el.contentEditable = 'false';
+    el.classList.remove('editing');
+    const path = el.dataset.path;
+    const val = el.textContent.trim();
+    el.removeEventListener('blur', commit);
+    el.removeEventListener('keydown', onKey);
+    if (store.get(path) !== val) { store.set(path, val); toast('已更新并自动存档'); }
+    else render();
+  };
+  const onKey = (ev) => {
+    if (ev.key === 'Enter') { ev.preventDefault(); el.blur(); }
+    if (ev.key === 'Escape') { el.textContent = store.get(el.dataset.path); el.blur(); }
+  };
+  el.addEventListener('blur', commit);
+  el.addEventListener('keydown', onKey);
+}
+
+/* ───────── 决策门切换 ───────── */
+function toggleGate(key) {
+  const g = store.state.meta.gates[key];
+  g.status = g.status === 'confirmed' ? 'wait' : 'confirmed';
+  if (g.status === 'confirmed') g.time = new Date().toISOString().slice(0, 10);
+  store.persist(); render();
+  toast(g.status === 'confirmed' ? '决策门已确认 ✔' : '决策门改为等待确认');
+}
+
+/* ───────── 数据存档抽屉 ───────── */
+function openDrawer() { $('#drawer').hidden = false; $('#mask').hidden = false; renderArchives(); }
+function closeDrawer() { $('#drawer').hidden = true; $('#mask').hidden = true; }
+
+function renderArchives() {
+  const list = store.listArchives();
+  $('#arCount').textContent = list.length;
+  $('#arList').innerHTML = list.length ? list.map((a) => `
+    <div class="ar-item" data-id="${a.id}">
+      <div class="ar-main">
+        <div class="ar-name">${escapeHtml(a.name)}</div>
+        <div class="ar-meta">${new Date(a.time).toLocaleString('zh-CN')}${a.note ? ' · ' + escapeHtml(a.note) : ''}</div>
+      </div>
+      <div class="ar-acts">
+        <button class="mini" data-ar="restore" title="恢复">恢复</button>
+        <button class="mini" data-ar="rename" title="重命名">✎</button>
+        <button class="mini danger" data-ar="delete" title="删除">🗑</button>
+      </div>
+    </div>`).join('') : '<p class="dw-empty">暂无存档。修改数据后点上方「保存快照」即可归档。</p>';
+}
+
+/* ───────── 文件下载 / 导入 ───────── */
+function download(filename, text) {
+  const blob = new Blob([text], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+const slug = () => (store.state.meta.brand || 'report').replace(/\s+/g, '-') + '-立项-' + new Date().toISOString().slice(0, 10);
+
+/* ───────── PDF 导出（浏览器打印） ───────── */
+function exportPDF() {
+  const root = $('#printRoot');
+  root.innerHTML = slides.map((sl) => `<div class="print-page"><div class="slide-canvas">${sl.body}</div></div>`).join('');
+  document.body.classList.add('printing');
+  const done = () => { document.body.classList.remove('printing'); root.innerHTML = ''; window.removeEventListener('afterprint', done); };
+  window.addEventListener('afterprint', done);
+  setTimeout(() => window.print(), 60);
+}
+
+/* ───────── Toast ───────── */
+let toastTimer;
+function toast(msg) {
+  const t = $('#toast');
+  t.textContent = msg; t.hidden = false; t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { t.classList.remove('show'); setTimeout(() => (t.hidden = true), 250); }, 1900);
+}
+const escapeHtml = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+/* ───────── 事件委托 ───────── */
+document.addEventListener('click', (ev) => {
+  const t = ev.target;
+  const goEl = t.closest('[data-goto]');
+  if (goEl) { goto(+goEl.dataset.goto); return; }
+
+  const viewBtn = t.closest('[data-view]');
+  if (viewBtn) { view = viewBtn.dataset.view; render(); return; }
+
+  const navBtn = t.closest('[data-nav]');
+  if (navBtn) { nav(+navBtn.dataset.nav); return; }
+
+  const editEl = t.closest('.editable');
+  if (editEl) { startEdit(editEl); return; }
+
+  const gatePill = t.closest('.gate .gate-pill');
+  if (gatePill) { toggleGate(gatePill.closest('[data-gate]').dataset.gate); return; }
+
+  const arItem = t.closest('[data-ar]');
+  if (arItem) { handleArchiveAction(arItem); return; }
+
+  const act = t.closest('[data-act]')?.dataset.act;
+  if (act) handleAct(act);
+});
+
+function handleArchiveAction(btn) {
+  const id = btn.closest('.ar-item').dataset.id;
+  const kind = btn.dataset.ar;
+  if (kind === 'restore') { store.restoreArchive(id); closeDrawer(); toast('已恢复该存档'); }
+  else if (kind === 'delete') { if (confirm('确认删除该存档？')) { store.deleteArchive(id); renderArchives(); } }
+  else if (kind === 'rename') {
+    const cur = store.listArchives().find((a) => a.id === id);
+    const name = prompt('重命名存档', cur?.name || '');
+    if (name) { store.renameArchive(id, name.trim()); renderArchives(); }
+  }
+}
+
+function handleAct(act) {
+  switch (act) {
+    case 'archive': openDrawer(); break;
+    case 'close-drawer': closeDrawer(); break;
+    case 'print': exportPDF(); break;
+    case 'save-snap': {
+      const name = $('#snapName').value.trim();
+      const note = $('#snapNote').value.trim();
+      store.saveArchive(name, note);
+      $('#snapName').value = ''; $('#snapNote').value = '';
+      renderArchives(); toast('快照已保存 ✔');
+      break;
+    }
+    case 'export-current': download(slug() + '.json', store.exportCurrent()); toast('已导出当前报告'); break;
+    case 'export-bundle': download(slug() + '-整包.json', store.exportAll()); toast('已导出整包（含存档）'); break;
+    case 'import': $('#fileInput').click(); break;
+    case 'reset':
+      if (confirm('恢复为默认示例数据？当前未存档的修改将丢失（已保存的快照不受影响）。')) { store.resetToDefault(); toast('已恢复默认数据'); }
+      break;
+  }
+}
+
+$('#fileInput').addEventListener('change', (ev) => {
+  const file = ev.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    const res = store.importJSON(reader.result);
+    toast(res.msg);
+    if (res.ok) closeDrawer();
+  };
+  reader.readAsText(file);
+  ev.target.value = '';
+});
+
+$('#mask').addEventListener('click', closeDrawer);
+
+/* 键盘导航 */
+document.addEventListener('keydown', (ev) => {
+  if (document.activeElement?.isContentEditable) return;
+  if (!$('#drawer').hidden) { if (ev.key === 'Escape') closeDrawer(); return; }
+  if (view === 'deck') {
+    if (ev.key === 'ArrowRight' || ev.key === 'PageDown') { ev.preventDefault(); nav(1); }
+    if (ev.key === 'ArrowLeft' || ev.key === 'PageUp') { ev.preventDefault(); nav(-1); }
+    if (ev.key === 'Escape') { view = 'board'; render(); }
+  } else if (ev.key === 'Enter' || ev.key === 'ArrowRight') {
+    view = 'deck'; render();
+  }
+});
+
+window.addEventListener('resize', () => fitFrames());
+store.subscribe(() => { render(); if (!$('#drawer').hidden) renderArchives(); });
+
+render();
+
+</script>
+</body>
+</html>
