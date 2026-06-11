@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#1c1812">
+  <title>选品立项 PPT 看板 · Amico</title>
+  <meta name="description" content="亚马逊选品立项可视化 PPT 看板 — 9 章工作流、数据图表、决策门与本地数据存档。">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23c8861a%22/><text x=%2250%22 y=%2272%22 font-size=%2262%22 text-anchor=%22middle%22 fill=%22%23fff%22>📊</text></svg>">
+  <link rel="stylesheet" href="css/board.css">
+</head>
+<body>
+  <header class="tb">
+    <div class="tb-brand">
+      <span class="tb-mark">📊</span>
+      <div>
+        <p class="tb-title">选品立项 PPT 看板</p>
+        <p class="tb-sub" id="tbSub">亚马逊选品立项 · Amico</p>
+      </div>
+    </div>
+    <div class="tb-actions">
+      <div class="seg" role="tablist">
+        <button class="seg-btn is-on" data-view="board" role="tab">▦ 看板</button>
+        <button class="seg-btn" data-view="deck" role="tab">▶ 演示</button>
+      </div>
+      <button class="tb-btn" data-act="archive">🗂 数据存档</button>
+      <button class="tb-btn" data-act="print">🖨 导出 PDF</button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="side" id="side" aria-label="章节导航"></aside>
+    <main class="stage" id="stage"></main>
+  </div>
+
+  <!-- 数据存档抽屉 -->
+  <div class="mask" id="mask" hidden></div>
+  <aside class="drawer" id="drawer" hidden aria-label="数据存档">
+    <div class="drawer-head">
+      <h3>🗂 数据存档</h3>
+      <button class="icon-btn" data-act="close-drawer" aria-label="关闭">✕</button>
+    </div>
+    <div class="drawer-body">
+      <section class="dw-sec">
+        <h4>保存当前为存档</h4>
+        <input id="snapName" class="dw-input" placeholder="存档名称，如「评审稿 v1」">
+        <input id="snapNote" class="dw-input" placeholder="备注（可选）">
+        <button class="btn-primary" data-act="save-snap">＋ 保存快照</button>
+        <p class="dw-hint">当前数据已自动缓存在本浏览器；快照可随时一键恢复。</p>
+      </section>
+
+      <section class="dw-sec">
+        <h4>历史存档 <span class="dw-count" id="arCount">0</span></h4>
+        <div id="arList" class="ar-list"></div>
+      </section>
+
+      <section class="dw-sec">
+        <h4>导入 / 导出</h4>
+        <div class="dw-grid">
+          <button class="btn-ghost" data-act="export-current">⬇ 导出当前报告</button>
+          <button class="btn-ghost" data-act="export-bundle">⬇ 导出整包(含存档)</button>
+          <button class="btn-ghost" data-act="import">⬆ 导入 JSON</button>
+          <button class="btn-ghost danger" data-act="reset">↺ 恢复默认数据</button>
+        </div>
+      </section>
+    </div>
+  </aside>
+
+  <input type="file" id="fileInput" accept="application/json,.json" hidden>
+  <div class="toast" id="toast" hidden></div>
+  <div class="print-root" id="printRoot" aria-hidden="true"></div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
